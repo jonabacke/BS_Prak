@@ -42,3 +42,9 @@ void mutex_unlock(Mutex *mutex)
         exit(EXIT_FAILURE);
     }
 }
+
+void cleanup_handler(CPThread *thread)
+{
+	//mutex_unlock(thread->stack->fifo);
+	mutex_unlock(thread->pause);
+}

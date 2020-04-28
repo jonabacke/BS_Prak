@@ -20,6 +20,8 @@ void toggleThread(CPThread *stack);
 
 void printCommands();
 
+void turnBackOn(CPThread *stack);
+
 void cancelAll();
 
 #endif

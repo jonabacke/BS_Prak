@@ -17,7 +17,7 @@ void *control(void *not_used)
     char eingabe;
     while (1)
     {
-            sleep(3);
+           // sleep(3);
         // eingabe einlesen
         scanf("%c", &eingabe);
         // reagieren
@@ -56,14 +56,19 @@ void toggleThread(CPThread *stack)
 {
     if (stack->flag)
     {
-        stack->flag = !(stack->flag);
+        stack->flag = TURN_OFF;
         mutex_lock(stack->pause);
     }
     else
     {
-        stack->flag = !(stack->flag);
+        stack->flag = TURN_ON;
         mutex_unlock(stack->pause);
     }
+}
+
+void turnBackOn(CPThread *stack)
+{
+	if (TURN_OFF) stack->flag = TURN_ON;
 }
 
 void printCommands()
@@ -74,6 +79,10 @@ void printCommands()
 
 void cancelAll() 
 {
+	//turnBackOn(producerThreadOne);
+	//turnBackOn(producerThreadTwo);
+	//turnBackOn(consumerThreadOne);
+	printf("cancelAll wird betreten");
     int tc1 = pthread_cancel(producerThreadOne->thread);
     HANDLE_ERR(tc1);
     int tc2 = pthread_cancel(producerThreadTwo->thread);

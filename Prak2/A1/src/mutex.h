@@ -21,4 +21,6 @@ Mutex *make_mutex(void);
 void mutex_lock(Mutex *mutex);
 void mutex_unlock(Mutex *mutex);
 
+void cleanup_handler(CPThread *thread);
+
 #endif

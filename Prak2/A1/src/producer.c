@@ -6,9 +6,9 @@
 #include <semaphore.h>
 #include <malloc.h>
 #include <errno.h>
-
+#include"general.h"
 #include "producer.h"
-
+#include "mutex.h"
 
 
 void *producerHandler(CPThread *thread)
@@ -27,26 +27,32 @@ void *producerHandler(CPThread *thread)
 
 void producer(FIFOStack *stack, char value, CPThread *thread)
 {
-    void cancelDisable();
+
     mutex_lock(thread->pause);
+    //cancelDisable();
 #ifdef condition
     mutex_lock(stack->fifo);
+    pthread_cleanup_push(cleanup_handler, thread);
     while (stack_full(stack))
     {
         cond_wait(stack->nonFull, stack->fifo);
     }
     stack->array[stack->next_in] = value;
     stack->next_in = stack_incr(stack, stack->next_in);
-    mutex_unlock(stack->fifo);
+    pthread_cleanup_pop(1);
+    //mutex_unlock(stack->fifo);
     cond_signal(stack->nonFull);
 #else
+    cancelDisable();
     semaphore_wait(stack->spaces);
     mutex_lock(stack->fifo);
     stack->array[stack->next_in] = value;
     stack->next_in = stack_incr(stack, stack->next_in);
     mutex_unlock(stack->fifo);
     semaphore_post(stack->items);
-#endif // cond
-    mutex_unlock(thread->pause);
     cancelEnable();
+#endif // cond
+    //cancelEnable();
+    mutex_unlock(thread->pause);
+
 }

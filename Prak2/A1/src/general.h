@@ -15,6 +15,8 @@
 #define condition
 #define sleepConsumerTimer  3
 #define sleepProducerTimer  2
+#define TURN_ON				1
+#define TURN_OFF			0
 
 
 
@@ -55,5 +57,7 @@ extern pthread_t threadControl;
 void *check_malloc(int size);
 void cancelEnable();
 void cancelDisable();
+
+
 
 #endif

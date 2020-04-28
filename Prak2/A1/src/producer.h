@@ -24,4 +24,6 @@ void *producerHandler(CPThread *stack);
 
 void producer(FIFOStack *stack, char value, CPThread *thread);
 
+void unlockMutex(void *arg);
+
 #endif

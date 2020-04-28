@@ -15,7 +15,7 @@
 #include "mutex.h"
 #include "conditionVariable.h"
 #include "fifo.h"
-
+#include "mutex.h"
 
 
 int consumer(FIFOStack *stack, CPThread *thread);
@@ -23,6 +23,6 @@ int consumer(FIFOStack *stack, CPThread *thread);
 
 void *consumerHandler(CPThread *stack);
 
-
+void unlockMutex(void *arg);
 
 #endif

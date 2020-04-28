@@ -13,7 +13,6 @@
 
 
 
-
 pthread_t threadControl;
 
 
@@ -34,6 +33,7 @@ int main(int argc, char const *argv[])
 
 
     // ENDING THE PROGRAM
+
             printf("Thread canceling.....\n");
 //           int tc1 = pthread_cancel(producerThreadOne->thread);
 //            HANDLE_ERR(tc1);
@@ -44,10 +44,11 @@ int main(int argc, char const *argv[])
             int tc4 = pthread_cancel(threadControl);
             HANDLE_ERR(tc4);
 
-        #ifdef condition
             printf("Destroying Mutex.....\n");
             int md1 = pthread_mutex_destroy(stack->fifo);
             HANDLE_ERR(md1);
+        #ifdef condition
+            //cond var?
         #else
             printf("Destroying Semaphores.....\n");
             int sd1 = sem_destroy(stack->items);
@@ -55,7 +56,22 @@ int main(int argc, char const *argv[])
             int sd2 = sem_destroy(stack->spaces);
             HANDLE_ERR(sd2);
         #endif
-            printf("................ end of main process");
+
+            printf("Freeing memory.....\n");
+		#ifdef condition
+            free(stack->nonEmpty);
+            free(stack->nonFull);
+		#else
+            free(stack->items);
+            free(stack->spaces);
+		#endif
+
+            free(stack->fifo);
+            free(stack->array);
+            free(stack);
+
+
+            printf("................ end of main process.\n");
 
     return EXIT_SUCCESS;
 }
