@@ -27,7 +27,7 @@ CPThread *makeConsumerProducerThread(void *funktion, FIFOStack *stack, char *nam
     thread->pause = make_mutex();
     thread->flag = 1;
     thread->alphabet = alphabet;
-    thread->name;
+    thread->name = name;
     thread->stack = stack;
     return thread;    
 }

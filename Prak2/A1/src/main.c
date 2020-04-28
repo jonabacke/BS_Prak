@@ -35,12 +35,14 @@ int main(int argc, char const *argv[])
 
     // ENDING THE PROGRAM
             printf("Thread canceling.....\n");
-            int cp1 = pthread_cancel(producerThreadOne->thread);
-            HANDLE_ERR(cp1);
-            int cp2 = pthread_cancel(producerThreadTwo->thread);
-            HANDLE_ERR(cp2);
-            int cc1 = pthread_cancel(consumerThreadOne->thread);
-            HANDLE_ERR(cc1);
+//           int tc1 = pthread_cancel(producerThreadOne->thread);
+//            HANDLE_ERR(tc1);
+//            int tc2 = pthread_cancel(producerThreadTwo->thread);
+//            HANDLE_ERR(tc2);
+//            int tc3 = pthread_cancel(consumerThreadOne->thread);
+//            HANDLE_ERR(tc3);
+            int tc4 = pthread_cancel(threadControl);
+            HANDLE_ERR(tc4);
 
         #ifdef condition
             printf("Destroying Mutex.....\n");

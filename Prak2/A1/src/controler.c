@@ -7,6 +7,7 @@
 #include <malloc.h>
 #include <errno.h>
 #include <ctype.h>
+#include "myError.h"
 
 #include "controler.h"
 
@@ -24,18 +25,21 @@ void *control(void *not_used)
         {
         case '1':
             toggleThread(producerThreadOne);
+            printf("--- toggle Producer_1\n");
             break;
 
         case '2':
             toggleThread(producerThreadTwo);
+            printf("--- toggle Producer_2\n");
             break;
 
         case 'c':
             toggleThread(consumerThreadOne);
+            printf("--- toggle consumer\n");
             break;
 
         case 'q':
-            printf("beende System");
+            printf("--- Programm wird beendet.\n");
             cancelAll();
             break;
 
@@ -70,8 +74,10 @@ void printCommands()
 
 void cancelAll() 
 {
-    pthread_cancel(producerThreadOne->thread);
-    pthread_cancel(producerThreadTwo->thread);
-    pthread_cancel(consumerThreadOne->thread);
-    // pthread_cancel(threadControl);
+    int tc1 = pthread_cancel(producerThreadOne->thread);
+    HANDLE_ERR(tc1);
+    int tc2 = pthread_cancel(producerThreadTwo->thread);
+    HANDLE_ERR(tc2);
+    int tc3 = pthread_cancel(consumerThreadOne->thread);
+    HANDLE_ERR(tc3);
 }
