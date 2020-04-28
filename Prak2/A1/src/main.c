@@ -46,8 +46,6 @@ int main(int argc, char const *argv[])
             printf("Destroying Mutex.....\n");
             int md1 = pthread_mutex_destroy(stack->fifo);
             HANDLE_ERR(md1);
-            int md2 = pthread_mutex_destroy(stack->pause);
-            HANDLE_ERR(md2);
         #else
             printf("Destroying Semaphores.....\n");
             int sd1 = sem_destroy(stack->items);
