@@ -8,7 +8,7 @@
 #include "controler.h"
 #include "fifo.h"
 #include "thread.h"
-
+#include "myError.h"
 
 
 
@@ -31,6 +31,31 @@ int main(int argc, char const *argv[])
     pthread_join(consumerThreadOne->thread, NULL);
 
     pthread_mutex_destroy(stack->fifo);
+
+
+    // ENDING THE PROGRAM
+            printf("Thread canceling.....\n");
+            int cp1 = pthread_cancel(producerThreadOne->thread);
+            HANDLE_ERR(cp1);
+            int cp2 = pthread_cancel(producerThreadTwo->thread);
+            HANDLE_ERR(cp2);
+            int cc1 = pthread_cancel(consumerThreadOne->thread);
+            HANDLE_ERR(cc1);
+
+        #ifdef condition
+            printf("Destroying Mutex.....\n");
+            int dm1 = pthread_mutex_destroy(stack->fifo);
+            HANDLE_ERR(dm1);
+            int dm2 = pthread_mutex_destroy(stack->consumerQueue);
+            HANDLE_ERR(dm2);
+        #else
+            printf("Destroying Semaphores.....\n");
+            int sd1 = sem_destroy(stack->items);
+            HANDLE_ERR(sd1);
+            int sd2 = sem_destroy(stack->spaces);
+            HANDLE_ERR(sd2);
+        #endif
+            printf("................ end of main process");
 
     return EXIT_SUCCESS;
 }
