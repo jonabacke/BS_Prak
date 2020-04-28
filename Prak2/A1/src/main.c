@@ -44,10 +44,10 @@ int main(int argc, char const *argv[])
 
         #ifdef condition
             printf("Destroying Mutex.....\n");
-            int dm1 = pthread_mutex_destroy(stack->fifo);
-            HANDLE_ERR(dm1);
-            int dm2 = pthread_mutex_destroy(stack->consumerQueue);
-            HANDLE_ERR(dm2);
+            int md1 = pthread_mutex_destroy(stack->fifo);
+            HANDLE_ERR(md1);
+            int md2 = pthread_mutex_destroy(stack->pause);
+            HANDLE_ERR(md2);
         #else
             printf("Destroying Semaphores.....\n");
             int sd1 = sem_destroy(stack->items);

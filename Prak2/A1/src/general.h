@@ -12,9 +12,9 @@
 #include <errno.h>
 
 
-#define condition ;
-#define sleepConsumerTimer  3  ;
-#define sleepProducerTimer  2  ;
+#define condition
+#define sleepConsumerTimer  3
+#define sleepProducerTimer  2
 
 
 
