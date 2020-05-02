@@ -1,14 +1,15 @@
+/* ============================================================================
+ * Name        : sem.h
+ * Author      : Jonathan Backes, Tobias Hardjowirogo
+ * Version     : 1.1
+ * Description : This file provides functions to create and use semaphores.
+ * ============================================================================
+ */
 
-#ifndef SEM_H
-#define SEM_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
+
+#ifndef _SEM_H
+#define _SEM_H
+
 
 #include "general.h"
 
@@ -16,10 +17,24 @@
 typedef sem_t Semaphore;
 
 
+/* @brief   Initialize a semaphore with a certain value.
+*  @param   value  to initialize the semaphore with.
+*           (i.e. buffer size, elements in buffer)
+*/
 Semaphore *make_semaphore(int value);
 
+
+/* @brief   Waiting for semaphore being posted.
+*           (This function is a cancellation point.)
+*  @param   sem  is the semaphore
+*/
 void semaphore_wait(Semaphore *sem);
 
+
+/* @brief   Post the semaphore.
+*  @param   sem  is the semaphore
+*/
 void semaphore_post(Semaphore *sem);
 
-#endif
+
+#endif /*_SEM_H*/

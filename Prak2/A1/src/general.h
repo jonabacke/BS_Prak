@@ -1,44 +1,80 @@
+/* ============================================================================
+ * @file        : general.h
+ * @author      : Jonathan Backes, Tobias Hardjowirogo
+ * @version     : 1.1
+ * @brief       : This file provides shared includes, typedefs, macros etc.
+ * ============================================================================
+ */
+
 
 #ifndef GENERAL_H
 #define GENERAL_H
 
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/sem.h>
 #include <semaphore.h>
 #include <malloc.h>
 #include <errno.h>
+#include <string.h>
+#include <ctype.h>
+
+#include "mutex.h"
+#include "conditionVariable.h"
+#include "thread.h"
 
 
 #define condition
-#define sleepConsumerTimer  3
-#define sleepProducerTimer  2
+#define FOR_3_SECONDS       3
+#define FOR_2_SECONDS       2
 #define TURN_ON				1
 #define TURN_OFF			0
+#define BUFFER_SIZE         10
 
 
+// This macro prints an error gererated by the command cmd.
+// Standard Unix error handling and posix error handling will be supported.
+#define HANDLE_ERR(cmd) \
+{ \
+    int e = cmd; \
+    if (e) \
+    { \
+       printf( "Error in line %d of file %s: %s\n", __LINE__, __FILE__, strerror((e==-1)?errno:e)); \
+       exit(1); \
+    } \
+}
 
+
+/*TYPEDEFS*/
 typedef pthread_mutex_t Mutex;
 typedef pthread_cond_t Cond;
 typedef sem_t Semaphore;
+
+/*Struct for the FIFO Buffer*/
 typedef struct
 {
-    char *array;
-    int length;
-    int next_in;
-    int next_out;
-    Mutex *fifo;
+    char bufferContent[BUFFER_SIZE];
+    uint8_t readPointer;
+    uint8_t writePointer;
+    uint8_t bufferLevel;
+    Mutex *fifoMutex;
 #ifdef condition
-    Cond *nonEmpty;
-    Cond *nonFull;
+    Cond *buffer_empty;
+    Cond *buffer_not_empty;
+    Cond *buffer_full;
+    Cond *buffer_not_full;
 #else
-    Semaphore *items;
-    Semaphore *spaces;
+    Semaphore *buffer_elements;
+    Semaphore *buffer_capacity;
 #endif // semaphor
-} FIFOStack;
+} FIFOBuffer;
 
+
+/*Struct for a thread*/
 typedef struct
 {
     pthread_t thread;
@@ -46,18 +82,19 @@ typedef struct
     int flag;
     char *alphabet;
     char *name;
-    FIFOStack *stack;
+    FIFOBuffer *fifoBuffer;
 } CPThread;
 
-extern CPThread *producerThreadOne;
-extern CPThread *producerThreadTwo;
-extern CPThread *consumerThreadOne;
+
+extern CPThread *Producer_1;
+extern CPThread *Producer_2;
+extern CPThread *Consumer;
 extern pthread_t threadControl;
+
 
 void *check_malloc(int size);
 void cancelEnable();
 void cancelDisable();
 
 
-
-#endif
+#endif /*_GENERAL_H*/

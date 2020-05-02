@@ -1,40 +1,38 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
-#include <ctype.h>
-#include "myError.h"
+/* ============================================================================
+ * @file        : controler.h
+ * @author      : Jonathan Backes, Tobias Hardjowirogo
+ * @version     : 1.1
+ * @brief       : This file provides the control thread which can control and 
+ *                terminate the threads.
+ * ============================================================================
+ */
+
 
 #include "controler.h"
 
 
+/* @brief   Reads key input, can pause and terminate the threads.
+*/
 void *control(void *not_used)
 {
-    char eingabe;
+    /*READING AND EVALUATING INPUT*/
+    char order = getchar();
     while (1)
     {
-           // sleep(3);
-        // eingabe einlesen
-        scanf("%c", &eingabe);
-        // reagieren
-        switch (tolower(eingabe))
+        switch (tolower(order))
         {
         case '1':
-            toggleThread(producerThreadOne);
+            toggleThread(Producer_1);
             printf("--- toggle Producer_1\n");
             break;
 
         case '2':
-            toggleThread(producerThreadTwo);
+            toggleThread(Producer_2);
             printf("--- toggle Producer_2\n");
             break;
 
         case 'c':
-            toggleThread(consumerThreadOne);
+            toggleThread(Consumer);
             printf("--- toggle consumer\n");
             break;
 
@@ -52,41 +50,50 @@ void *control(void *not_used)
         }
     }
 }
-void toggleThread(CPThread *stack)
+
+
+/* @brief   Toggles (pauses) the producer or consumer threads.
+*  @param   Thread to be toggled.
+*/
+void toggleThread(CPThread *thread)
 {
-    if (stack->flag)
+    if (thread->flag)
     {
-        stack->flag = TURN_OFF;
-        mutex_lock(stack->pause);
+        thread->flag = TURN_OFF;
+        mutex_lock(thread->pause);
     }
     else
     {
-        stack->flag = TURN_ON;
-        mutex_unlock(stack->pause);
+        thread->flag = TURN_ON;
+        mutex_unlock(thread->pause);
     }
 }
 
-void turnBackOn(CPThread *stack)
-{
-	if (TURN_OFF) stack->flag = TURN_ON;
-}
 
+/* @brief   Prints all available commands when 'h' key is pressed.
+*/
 void printCommands()
 {
-    printf(
-        "\n\n -----------------------------------\n Commands:\n 1\t start / stop 'Producer_1'\n 2\t start / stop 'Producer_2'\n c / C\t start / stop 'Consumer'\n q / Q\t terminate the system\n h\t print commands\n------------------------------------\n\n\n ");
+    printf( "\n\n -----------------------------------\n" 
+            "Commands:\n"
+            "1\t start/stop 'Producer_1'\n"
+            "2\t start/stop 'Producer_2'\n" 
+            "c/C\t start/stop 'Consumer'\n"
+            "q/Q\t terminate the system\n" 
+            "h\t print commands\n"
+            "------------------------------------\n\n\n ");
 }
 
+
+/* @brief   Terminates the producer and consumer threads.
+*/
 void cancelAll() 
 {
-	//turnBackOn(producerThreadOne);
-	//turnBackOn(producerThreadTwo);
-	//turnBackOn(consumerThreadOne);
 	printf("cancelAll wird betreten");
-    int tc1 = pthread_cancel(producerThreadOne->thread);
+    int tc1 = pthread_cancel(Producer_1->thread);
     HANDLE_ERR(tc1);
-    int tc2 = pthread_cancel(producerThreadTwo->thread);
+    int tc2 = pthread_cancel(Producer_2->thread);
     HANDLE_ERR(tc2);
-    int tc3 = pthread_cancel(consumerThreadOne->thread);
+    int tc3 = pthread_cancel(Consumer->thread);
     HANDLE_ERR(tc3);
 }

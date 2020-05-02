@@ -1,17 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
+
 
 #include "general.h"
 
-CPThread *producerThreadOne = NULL;
-CPThread *producerThreadTwo = NULL;
-CPThread *consumerThreadOne = NULL;
 
 void *check_malloc(int size)
 {

@@ -1,32 +1,44 @@
-#ifndef FIFO_H
-#define FIFO_H
+/* ============================================================================
+ * @file        : fifo.h
+ * @author      : Jonathan Backes, Tobias Hardjowirogo
+ * @version     : 1.1
+ * @brief       : This file provides the FIFO buffer with it's functionalities
+ * ============================================================================
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
+
+#ifndef _FIFO_H
+#define _FIFO_H
+
 
 #include "general.h"
-#include "sem.h"
 #include "mutex.h"
-#include "conditionVariable.h"
+#include "semaphore.h"
 
 
 typedef sem_t Semaphore;
 
-FIFOStack *make_stack(int length);
+
+/* @brief   Initializes a FIFO buffer
+*/
+FIFOBuffer *make_fifoBuffer();
 
 
-int stack_incr(FIFOStack *stack, int next);
+/* @brief   Write a letter in the FIFO buffer. 
+*           This function is secured for synchronized access.
+*  @param   fifoBuffer  The buffer to work on
+*  @param   thread      The thread writing in the buffer
+*  @param   letter      The letter to be written in the buffer
+*/
+void writeInFIFO(FIFOBuffer *fifoBuffer, CPThread *thread, char letter);
 
 
-int stack_empty(FIFOStack *stack);
+/* @brief   Read a letter from the FIFO buffer. 
+*           This function is secured for synchronized access.
+*  @param   fifoBuffer  The buffer to work on
+*  @param   thread      The thread reading from the buffer
+*/
+char readFromFIFO(FIFOBuffer *fifoBuffer, CPThread *thread);
 
 
-int stack_full(FIFOStack *stack);
-
-#endif
+#endif /*_FIFO_H*/

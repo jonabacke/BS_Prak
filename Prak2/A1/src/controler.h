@@ -1,27 +1,39 @@
-#ifndef CONTROLER_H
-#define CONTROLER_H
+/* ============================================================================
+ * @file        : controler.h
+ * @author      : Jonathan Backes, Tobias Hardjowirogo
+ * @version     : 1.1
+ * @brief       : This file provides the control thread which can control and 
+ *                terminate the threads.
+ * ============================================================================
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
+
+#ifndef _CONTROLER_H
+#define _CONTROLER_H
+
 
 #include "general.h"
-#include "mutex.h"
 
 
+/* @brief   Reads key input, can pause and terminate the threads.
+*/
 void *control(void *not_used);
 
-void toggleThread(CPThread *stack);
 
+/* @brief   Toggles (pauses) the producer or consumer threads.
+*  @param   Thread to be toggled.
+*/
+void toggleThread(CPThread *thread);
+
+
+/* @brief   Prints all available commands when 'h' key is pressed.
+*/
 void printCommands();
 
-void turnBackOn(CPThread *stack);
 
+/* @brief   Terminates the producer and consumer threads.
+*/
 void cancelAll();
 
-#endif
+
+#endif /*_CONTROLER_H*/

@@ -1,58 +1,48 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
-#include"general.h"
+/* ============================================================================
+ * Name        : producer.c
+ * Author      : Jonathan Backes, Tobias Hardjowirogo
+ * Version     : 1.1
+ * Description : This file provides the produce function for the producer threads.
+ * ============================================================================
+ */
+
+
 #include "producer.h"
-#include "mutex.h"
 
 
-void *producerHandler(CPThread *thread)
+/* @brief   A Producer thread uses this function to put a letter from the alphabet 
+*           into the FIFO buffer. Producer_1 submits a lower case letter and 
+*           Producer_2 an upper case letter. After submitting the letter the thread 
+*           takes a break for 2 seconds.
+*  @param   fifoBuffer  The buffer to put the letter into.
+*  @param   thread      Producer_1 or Producer_2
+*/
+void *produce(FIFOBuffer *fifoBuffer, CPThread *thread)
 {
-    while (1)
+    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    
+    printf("%s wurde aktiviert.", thread->name);
+    while(1)
     {
-        for (int i = 0; i < sizeof(thread->alphabet); i++)
+        char letter;
+
+        for (int i = 0; i < sizeof(alphabet); i ++)
         {
-            producer(thread->stack, thread->alphabet[i], thread);
-            printf("%s schreibt %c in Puffer \n", thread->name, thread->alphabet[i]);
-            sleep(sleepProducerTimer);
+            if ("producer_1" == thread->name)
+                {
+            letter = tolower(alphabet[i]);
+            }
+            else
+            {
+                letter = alphabet[i];
+            }      
+            writeInFIFO(fifoBuffer, thread, letter);
+            printf("%s schreibt %c in den FIFO-Puffer.\n", thread->name, letter);
+            sleep(FOR_2_SECONDS);
         }
-    }
+    }   
+    printf("%s wurde terminiert.", thread->name);
 }
 
 
-void producer(FIFOStack *stack, char value, CPThread *thread)
-{
 
-    mutex_lock(thread->pause);
-    //cancelDisable();
-#ifdef condition
-    mutex_lock(stack->fifo);
-    pthread_cleanup_push(cleanup_handler, thread);
-    while (stack_full(stack))
-    {
-        cond_wait(stack->nonFull, stack->fifo);
-    }
-    stack->array[stack->next_in] = value;
-    stack->next_in = stack_incr(stack, stack->next_in);
-    pthread_cleanup_pop(1);
-    //mutex_unlock(stack->fifo);
-    cond_signal(stack->nonFull);
-#else
-    cancelDisable();
-    semaphore_wait(stack->spaces);
-    mutex_lock(stack->fifo);
-    stack->array[stack->next_in] = value;
-    stack->next_in = stack_incr(stack, stack->next_in);
-    mutex_unlock(stack->fifo);
-    semaphore_post(stack->items);
-    cancelEnable();
-#endif // cond
-    //cancelEnable();
-    mutex_unlock(thread->pause);
-
-}

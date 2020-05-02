@@ -1,34 +1,28 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
+/* ============================================================================
+ * Name        : thread.c
+ * Author      : Jonathan Backes, Tobias Hardjowirogo
+ * Version     : 1.1
+ * Description : This file provides a function to initialize producer or consumer threads.
+ * ============================================================================
+ */
+
 
 #include "thread.h"
 
 
-void make_thread(pthread_t *thread, void *funktion, void *stack)
-{
-    int n = pthread_create(thread, NULL, funktion, stack);
-    if (n != 0)
-    {
-        perror("make_thread failed");
-        exit(EXIT_FAILURE);
-    }
-}
-
-CPThread *makeConsumerProducerThread(void *funktion, FIFOStack *stack, char *name, char *alphabet)
+/* @brief   Initializes a producer or a consumer thread.
+*  @param   fifoBuffer  The buffer to read from or write on.
+*  @param   name        Name of the Thread
+*/
+CPThread *makeConsumerProducerThread(FIFOBuffer *fifoBuffer, char *name)
 {
     CPThread *thread = check_malloc(sizeof(CPThread));
-    make_thread(&(thread->thread), funktion, thread);
     thread->pause = make_mutex();
     thread->flag = 1;
-    thread->alphabet = alphabet;
     thread->name = name;
-    thread->stack = stack;
+    thread->fifoBuffer = fifoBuffer;
     return thread;    
 }
+
+
 

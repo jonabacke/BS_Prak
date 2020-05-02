@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "*.rh": "c",
+        "condition_variable": "c",
+        "mutex": "c",
+        "thread": "c",
+        "semaphore.h": "c",
+        "pthread.h": "c",
+        "unistd.h": "c",
+        "taskqueue.h": "c",
+        "consumergeneraterthread.h": "c"
+    }
+}
