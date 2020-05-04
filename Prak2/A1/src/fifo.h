@@ -7,38 +7,86 @@
  */
 
 
-#ifndef _FIFO_H
-#define _FIFO_H
+#ifndef FIFO_H
+#define FIFO_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/sem.h>
+#include <semaphore.h>
+#include <malloc.h>
+#include <errno.h>
 
 #include "general.h"
+#include "sem.h"
 #include "mutex.h"
-#include "semaphore.h"
+#include "conditionVariable.h"
 
 
 typedef sem_t Semaphore;
 
 
-/* @brief   Initializes a FIFO buffer
+
+/* ============================================================================
+*  @brief   Initialize a FIFO buffer.
+*  @return  Returns an initalized FIFO buffer.
 */
-FIFOBuffer *make_fifoBuffer();
+FIFOBuffer *make_FIFOBuffer(void);
 
 
-/* @brief   Write a letter in the FIFO buffer. 
+
+/* ============================================================================
+*  @brief   Write a letter in the FIFO buffer. 
 *           This function is secured for synchronized access.
-*  @param   fifoBuffer  The buffer to work on
-*  @param   thread      The thread writing in the buffer
-*  @param   letter      The letter to be written in the buffer
+*  @param   'fifoBuffer'  The buffer to work on
+*  @param   'letter'      The letter to be written in the buffer
 */
-void writeInFIFO(FIFOBuffer *fifoBuffer, CPThread *thread, char letter);
+void writeInFIFO(FIFOBuffer *fifoBuffer, char letter);
 
 
-/* @brief   Read a letter from the FIFO buffer. 
+
+/* ============================================================================
+*  @brief   Read a letter from the FIFO buffer. 
 *           This function is secured for synchronized access.
-*  @param   fifoBuffer  The buffer to work on
-*  @param   thread      The thread reading from the buffer
+*  @param   'fifoBuffer'    The buffer to work on
+*  @return  'letter'        Returns the letter that has been read from the FIFO buffer.
 */
-char readFromFIFO(FIFOBuffer *fifoBuffer, CPThread *thread);
+char readFromFIFO(FIFOBuffer *fifoBuffer);
+
+
+
+/* ============================================================================
+*  @brief   Increases the readPointer or the writePointer of the FIFO buffer.
+*           Increases by 1 with each step until buffer size is reached.
+*           Then restarts at 1.
+*  @param   'fifoBuffer'    The buffer controlled via the pointers.
+*  @param   'next'          Either the readPointer or the writePointer to increase.
+*  @return  'next'          Returns the correctly moved pointer.
+*/
+int bufferPointer_incr(FIFOBuffer *fifoBuffer, int next);
+
+
+
+/* ============================================================================
+*  @brief   If the writePointer and the readPointer are at the same level,
+*           the FIFO buffer is empty.  
+*  @param   'fifoBuffer'    The buffer to be checked.  
+*  @return  'true'          if the buffer is empty else 'false'.
+*/
+int is_buffer_empty(FIFOBuffer *fifoBuffer);
+
+
+
+/* ============================================================================
+*  @brief   If the writePointer+1 is at the same level as the readPointer,
+*           the buffer is full.
+*  @param   'fifoBuffer'    The buffer to be checked.  
+*  @return  'true'          if the buffer is full else 'false'.
+*/
+int is_buffer_full(FIFOBuffer *fifoBuffer);
+
 
 
 #endif /*_FIFO_H*/

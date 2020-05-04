@@ -7,25 +7,34 @@
  */
 
 
-#ifndef _PRODUCER_H
-#define _PRODUCER_H
+#ifndef PRODUCER_H
+#define PRODUCER_H
 
-
-#include <ctype.h>
-#include "general.h"
+#include <ctype.h> //tolower
 #include "fifo.h"
+#include "mutex.h"
+#include "general.h"
 
 
-/* @brief   A Producer thread uses this function to put a letter from the alphabet into the FIFO buffer.
-*           Producer_1 submits a lower case letter and Producer_2 an upper case letter.
-*           After submitting the letter the thread takes a break for 2 seconds.
-*  @param   fifoBuffer  The buffer to put the letter into.
-*  @param   thread      Producer_1 or Producer_2
+
+/* ============================================================================
+*  @brief   The Producer Handler keeps the Producer threads using the 'producer'
+*           function to write a letter from the alphabet to the FIFO buffer, 
+*           print the letter and then pause for 2 seconds.
+*  @param   'thread'    Producer thread
 */
-void *produce(FIFOBuffer *fifoBuffer, CPThread *thread);
+void *producerHandler(CPThread *thread);
+
+
+
+/* ============================================================================
+*  @brief   A Producer thread uses this function to write a letter into the FIFO buffer.
+*  @param   'fifoBuffer'    The buffer to put the letter into.
+*  @param   'letter'        The letter to write
+*  @param   'thread'        Producer_1 or Producer_2
+*/
+void producer(FIFOBuffer *fifoBuffer, char letter, CPThread *thread);
+
 
 
 #endif /*_PRODUCER_H*/
-
-
-

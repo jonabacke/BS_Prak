@@ -10,20 +10,59 @@
 #ifndef _THREAD_H
 #define _THREAD_H
 
+//#include <stdio.h>
+#include <stdlib.h>
+//#include <malloc.h>
 
 #include "general.h"
 #include "mutex.h"
-#include "thread.h"
-#include "fifo.h"
-#include "producer.h"
 #include "consumer.h"
+#include "producer.h"
 
 
-/* @brief   Initializes a producer or a consumer thread.
-*  @param   fifoBuffer  The buffer to read from or write on.
-*  @param   name        Name of the Thread
+
+/* ============================================================================
+*  @brief   Creates a thread.
+*  @param   'thread'        The thread to create (producer/consumer/control).
+*  @param   'function'      The function to work with (producerHandler/consumerHandler/control).
+*  @param   'fifoBuffer'    The buffer to work with.
 */
-CPThread *makeConsumerProducerThread(FIFOBuffer *fifoBuffer, char *name);
+void make_thread(pthread_t* thread, void *function, void *fifoBuffer);
+
+
+
+/* ============================================================================
+*  @brief   Initializes a producer or a consumer thread.
+*  @param   'function'      The function to work with (producerHandler/consumerHandler/control).
+*  @param   'fifoBuffer'    The buffer to read from or write on.
+*  @param   'name'          Name of the Thread
+*/
+CPThread *makeConsumerProducerThread(void *function, FIFOBuffer *fifoBuffer, char *name);
+
+
+
+/* ============================================================================
+*  @brief   Set cancel state (enable) with error handling.
+*/
+void cancelEnable(void);
+
+
+
+/* ============================================================================
+*  @brief   Set cancel state (disable) with error handling.
+*/
+void cancelDisable(void);
+
+
+
+/* ============================================================================
+*  @brief   Function for allocating storage with error handling.
+*/
+void *check_malloc(int size);
 
 
 #endif /*_THREAD_H*/
+
+
+
+

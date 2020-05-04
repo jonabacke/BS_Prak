@@ -10,39 +10,57 @@
 #include "producer.h"
 
 
-/* @brief   A Producer thread uses this function to put a letter from the alphabet 
-*           into the FIFO buffer. Producer_1 submits a lower case letter and 
-*           Producer_2 an upper case letter. After submitting the letter the thread 
-*           takes a break for 2 seconds.
-*  @param   fifoBuffer  The buffer to put the letter into.
-*  @param   thread      Producer_1 or Producer_2
+
+/* ============================================================================
+*  @brief   The Producer Handler keeps the Producer threads using the 'producer'
+*           function to write a letter from the alphabet to the FIFO buffer,
+*           print the letter and then pause for 2 seconds.
+*           Producer_1 submits a lower case letter and Producer_2 an upper case letter.
+*  @param   'thread'    Producer thread
 */
-void *produce(FIFOBuffer *fifoBuffer, CPThread *thread)
+void *producerHandler(CPThread *thread)
 {
+    printf("producerhandler entered\n");
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     
-    printf("%s wurde aktiviert.", thread->name);
-    while(1)
+    //while (PRODUCER_THREAD_ACTIVE)
+    while(thread->flag)
     {
         char letter;
-
-        for (int i = 0; i < sizeof(alphabet); i ++)
+        
+        for (int i = 0; i < sizeof(alphabet); i++)
         {
-            if ("producer_1" == thread->name)
-                {
-            letter = tolower(alphabet[i]);
+            if (producerThread_1 == thread)
+            {
+                letter = tolower(alphabet[i]);
             }
             else
             {
                 letter = alphabet[i];
-            }      
-            writeInFIFO(fifoBuffer, thread, letter);
-            printf("%s schreibt %c in den FIFO-Puffer.\n", thread->name, letter);
-            sleep(FOR_2_SECONDS);
+            }
+            
+            producer(thread->fifoBuffer, letter, thread);
+            printf("%s schreibt %c in Puffer \n", thread->name, letter);
+            sleep(TWO_SECONDS);
         }
-    }   
-    printf("%s wurde terminiert.", thread->name);
+    }
+    printf("%s wurde terminiert.\n", thread->name);
 }
 
+
+/* ============================================================================
+*  @brief   A Producer thread uses this function to write a letter into the FIFO buffer.
+*  @param   'fifoBuffer'    The buffer to put the letter into.
+*  @param   'letter'        The letter to write
+*  @param   'thread'        Producer_1 or Producer_2
+*/
+void producer(FIFOBuffer *fifoBuffer, char letter, CPThread *thread)
+{
+    mutex_lock(thread->pauseMutex);
+    pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
+        writeInFIFO(fifoBuffer, letter);
+    pthread_cleanup_pop(1);
+    //mutex_unlock(thread->pauseMutex);
+}
 
 

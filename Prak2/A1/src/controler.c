@@ -1,5 +1,5 @@
 /* ============================================================================
- * @file        : controler.h
+ * @file        : controler.c
  * @author      : Jonathan Backes, Tobias Hardjowirogo
  * @version     : 1.1
  * @brief       : This file provides the control thread which can control and 
@@ -11,28 +11,32 @@
 #include "controler.h"
 
 
-/* @brief   Reads key input, can pause and terminate the threads.
+
+/* ============================================================================
+*  @brief   Function used by the control thread. Reads key input, can pause 
+*           and terminate the created threads.
 */
 void *control(void *not_used)
 {
-    /*READING AND EVALUATING INPUT*/
-    char order = getchar();
     while (1)
-    {
+    {   
+        /*READING AND EVALUATING KEY INPUT*/
+        char order = getchar();
+
         switch (tolower(order))
         {
         case '1':
-            toggleThread(Producer_1);
+            toggleThread(producerThread_1);
             printf("--- toggle Producer_1\n");
             break;
 
         case '2':
-            toggleThread(Producer_2);
+            toggleThread(producerThread_2);
             printf("--- toggle Producer_2\n");
             break;
 
         case 'c':
-            toggleThread(Consumer);
+            toggleThread(consumerThread);
             printf("--- toggle consumer\n");
             break;
 
@@ -52,7 +56,9 @@ void *control(void *not_used)
 }
 
 
-/* @brief   Toggles (pauses) the producer or consumer threads.
+
+/* ============================================================================
+*  @brief   Toggles (pauses) the producer or consumer threads.
 *  @param   Thread to be toggled.
 */
 void toggleThread(CPThread *thread)
@@ -60,17 +66,19 @@ void toggleThread(CPThread *thread)
     if (thread->flag)
     {
         thread->flag = TURN_OFF;
-        mutex_lock(thread->pause);
+        mutex_lock(thread->pauseMutex);
     }
     else
     {
         thread->flag = TURN_ON;
-        mutex_unlock(thread->pause);
+        mutex_unlock(thread->pauseMutex);
     }
 }
 
 
-/* @brief   Prints all available commands when 'h' key is pressed.
+
+/* ============================================================================
+*  @brief   Prints all available commands when 'h' key is pressed.
 */
 void printCommands()
 {
@@ -85,15 +93,21 @@ void printCommands()
 }
 
 
-/* @brief   Terminates the producer and consumer threads.
+
+/* ============================================================================
+*  @brief   Terminates the producer and consumer threads.
 */
 void cancelAll() 
 {
-	printf("cancelAll wird betreten");
-    int tc1 = pthread_cancel(Producer_1->thread);
+	printf("cancelAll wird betreten \n");
+    int tc1 = pthread_cancel(producerThread_1->thread);
     HANDLE_ERR(tc1);
-    int tc2 = pthread_cancel(Producer_2->thread);
+    int tc2 = pthread_cancel(producerThread_2->thread);
     HANDLE_ERR(tc2);
-    int tc3 = pthread_cancel(Consumer->thread);
+    int tc3 = pthread_cancel(consumerThread->thread);
     HANDLE_ERR(tc3);
 }
+
+
+
+

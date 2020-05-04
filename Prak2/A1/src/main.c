@@ -7,61 +7,62 @@
  */
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <errno.h>
+
 #include "general.h"
-#include "producer.h"
-#include "consumer.h"
 #include "controler.h"
+#include "fifo.h"
+#include "thread.h"
 
-CPThread *Producer_1 = NULL;
-CPThread *Producer_2 = NULL;
-CPThread *Consumer = NULL;
 
-pthread_t threadControl;
+
 
 
 /* @brief   In the main the threads are created and at the end their remains destroyed.
 */
 int main(int argc, char const *argv[])
 {
-    FIFOBuffer *fifoBuffer = make_fifoBuffer();
-    Producer_1 = makeConsumerProducerThread(fifoBuffer, "Producer_1");
-    Producer_2 = makeConsumerProducerThread(fifoBuffer, "Producer_2");
-    Consumer = makeConsumerProducerThread(fifoBuffer, "Consumer");
+    FIFOBuffer *fifoBuffer = make_FIFOBuffer();
+    producerThread_1 = makeConsumerProducerThread(producerHandler, fifoBuffer, "Producer_1");
+    producerThread_2 = makeConsumerProducerThread(producerHandler, fifoBuffer, "Producer_2");
+    consumerThread = makeConsumerProducerThread(consumerHandler, fifoBuffer, "Consumer");
+    pthread_create(&controlThread, NULL, control, NULL);
 
-    int tcr1 = pthread_create(Producer_1->thread, NULL, produce, fifoBuffer);
-    HANDLE_ERR(tcr1);
-    int tcr2 = pthread_create(Producer_2->thread, NULL, produce, fifoBuffer);
-    HANDLE_ERR(tcr2);
-    int tcr3 = pthread_create(Consumer->thread, NULL, consume, fifoBuffer);
-    HANDLE_ERR(tcr3);
-    int tcr4 = pthread_create(&threadControl, NULL, control, NULL);
-    HANDLE_ERR(tcr4);
-
-    int tj1 = pthread_join(Producer_1->thread, NULL);
-    HANDLE_ERR(tj1);
-    int tj2 = pthread_join(Producer_2->thread, NULL);
-    HANDLE_ERR(tj2);
-    int tj3 = pthread_join(Consumer->thread, NULL);
-    HANDLE_ERR(tj3);
+    pthread_join(producerThread_1->thread, NULL);
+    pthread_join(producerThread_2->thread, NULL);
+    pthread_join(consumerThread->thread, NULL);
+    pthread_join(controlThread, NULL);
 
     
+
+
     // ENDING THE PROGRAM
 
             printf("Thread canceling.....\n");
             /*tc1-tc3 are cancelled in the control module*/
-            int tc4 = pthread_cancel(threadControl);
+            int tc4 = pthread_cancel(controlThread);
             HANDLE_ERR(tc4);
 
             printf("Destroying Mutex.....\n");
-            int md1 = pthread_mutex_destroy(fifoBuffer->fifoMutex);
+            int md1 = pthread_mutex_destroy(fifoBuffer->bufferMutex);
             HANDLE_ERR(md1);
     
-        #ifdef condition
-           /*int cd1 = cond_destroy(fifoBuffer->nonEmpty);
+        #ifdef condition /*Conditional Variables*/
+           /*
+            int cd1 = cond_destroy(fifoBuffer->buffer_empty);
             HANDLE_ERR(cd1);
-            int cd2 = cond_destroy(fifoBuffer->nonFull);
-            HANDLE_ERR(cd2);*/
-        #else
+            int cd2 = cond_destroy(fifoBuffer->buffer_not_empty);
+            HANDLE_ERR(cd2);
+            int cd3 = cond_destroy(fifoBuffer->buffer_full);
+            HANDLE_ERR(cd3);
+            int cd4 = cond_destroy(fifoBuffer->buffer_not_full);
+            HANDLE_ERR(cd4);
+            */
+        #else /*Semaphores*/
             printf("Destroying Semaphores.....\n");
             int sd1 = sem_destroy(fifoBuffer->buffer_elements);
             HANDLE_ERR(sd1);
@@ -70,22 +71,19 @@ int main(int argc, char const *argv[])
         #endif
 
             printf("Freeing memory.....\n");
-		#ifdef condition
+		#ifdef condition /*Conditional Variables*/
             free(fifoBuffer->buffer_empty);
             free(fifoBuffer->buffer_not_empty);
             free(fifoBuffer->buffer_full);
             free(fifoBuffer->buffer_not_full);
-		#else
+		#else /*Semaphores*/
             free(fifoBuffer->buffer_elements);
             free(fifoBuffer->buffer_capacity);
 		#endif
 
-            free(fifoBuffer->fifoMutex);
-            //free(fifoBuffer->bufferContent[BUFFER_SIZE]);
+            free(fifoBuffer->bufferMutex);
+            free(fifoBuffer->bufferContent);
             free(fifoBuffer);
-            free(Producer_1);
-            free(Producer_2);
-            free(Consumer);
 
 
             printf("................ end of main process.\n");

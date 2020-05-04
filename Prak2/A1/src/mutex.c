@@ -7,10 +7,14 @@
  */
 
 
-#include <sys/sem.h>
 #include "mutex.h"
+#include "fifo.h"
 
 
+/* ============================================================================
+*  @brief   This function creates a Mutex.
+*  @return  'mutex'     Returns a Mutex
+*/
 Mutex *make_mutex(void)
 {
     Mutex *mutex = check_malloc(sizeof(Mutex));
@@ -20,6 +24,10 @@ Mutex *make_mutex(void)
 }
 
 
+
+/* ============================================================================
+*  @brief   This function locks a Mutex - with error handling.
+*/
 void mutex_lock(Mutex *mutex)
 {
     int n = pthread_mutex_lock(mutex);
@@ -27,16 +35,29 @@ void mutex_lock(Mutex *mutex)
 }
 
 
+
+/* ============================================================================
+*  @brief   This function unlocks a Mutex - with error handling.
+*/
 void mutex_unlock(Mutex *mutex)
 {
     int n = pthread_mutex_unlock(mutex);
-    if (n != 0)
     HANDLE_ERR(n);
 }
 
 
-void cleanup_handler(CPThread *thread)
-{
-	//mutex_unlock(thread->stack->fifo);
-	mutex_unlock(thread->pause);
+
+/* ============================================================================
+*  @brief   This function provides the cleanup handling for a Mutex 
+*           in case of a thread canceling while the buffer is locked.
+*/
+void cleanup_handler(void *p)
+{	
+	mutex_unlock(p);
 }
+
+
+
+
+
+

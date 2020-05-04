@@ -11,8 +11,20 @@
 #define _CONSUMER_H
 
 
+
+#include "mutex.h"
 #include "general.h"
-#include "fifo.h"
+
+
+
+/* ============================================================================
+*  @brief   The Consumer Handler keeps the Consumer thread using the 'consumer'
+*           function to read a letter from the FIFO buffer, print the letter 
+*           and then pause for 3 seconds.
+*  @param   thread      Consumer thread
+*/
+void *consumerHandler(CPThread *thread);
+
 
 
 /* @brief   A Consumer thread uses this function to take a letter from the 
@@ -21,7 +33,12 @@
 *  @param   fifoBuffer  The buffer to read the letter from.
 *  @param   thread      Consumer
 */
-void *consume(FIFOBuffer *fifoBuffer, CPThread *thread);
+char consumer(FIFOBuffer *fifoBuffer, CPThread *thread);
+
+
+
+//void unlockMutex(void *arg);
+
 
 
 #endif /*_CONSUMER_H*/

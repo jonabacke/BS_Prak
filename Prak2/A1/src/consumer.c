@@ -10,23 +10,46 @@
 #include "consumer.h"
 
 
-/* @brief   A Consumer thread uses this function to take a letter from the 
-*           FIFO buffer and print it. After reading the letter the thread takes 
-*           a break for 3 seconds.
-*  @param   fifoBuffer  The buffer to read the letter from.
-*  @param   thread      Consumer
+
+/* ============================================================================
+*  @brief   The Consumer Handler keeps the Consumer thread using the 'consumer'
+*           function to read a letter from the FIFO buffer, print the letter 
+*           and then pause for 3 seconds.
+*  @param   thread      Consumer thread
 */
-void *consume(FIFOBuffer *fifoBuffer, CPThread *thread)
-{
-    printf("%s wurde aktiviert.", thread->name);
-    while(1)
+void *consumerHandler(CPThread *thread)
+{   
+    while (CONSUMER_THREAD_ACTIVE)
     {
-        char letter = readFromFIFO(fifoBuffer, thread); 
-        printf("%s nimmt %c aus dem FIFO-Puffer.\n", thread->name, letter);   
-        sleep(FOR_3_SECONDS);
+        printf("%s nimmt %c aus Puffer \n", thread->name, consumer(thread->fifoBuffer, thread));
+        sleep(THREE_SECONDS);
     }
-    printf("%s wurde terminiert.", thread->name);
+    printf("%s wurde terminiert.\n", thread->name);
 }
+
+
+
+/* ============================================================================
+*  @brief   A Consumer thread uses this function to take a letter from the 
+*           FIFO buffer. 
+*  @param   fifoBuffer  The FIFO buffer to read the letter from.
+*  @param   thread      Consumer thread
+*  @return  letter      Returns the letter that has been read from the FIFO buffer
+*/
+char consumer(FIFOBuffer *fifoBuffer, CPThread *thread)
+{
+    printf("consumer active\n");
+    char letter;
+    
+    mutex_lock(thread->pauseMutex);
+    pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
+    letter = readFromFIFO(fifoBuffer);
+    pthread_cleanup_pop(1);
+    mutex_unlock(thread->pauseMutex);
+
+    return letter;
+}
+
 
 
 
