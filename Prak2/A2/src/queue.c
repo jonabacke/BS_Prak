@@ -27,7 +27,7 @@ void readFromQueue(Queue *queue, char *argBuf)
     }
     cancelDisable();
     /*CRITICAL SECTION*/
-    receiveFromTaskQueue(queue->queue, queue->header, queue->bufferContent, sizeof(char));
+    receiveFromTaskQueue(queue->queue, queue->header, argBuf, sizeof(char));
     queue->readPointer = queuePointer_incr(queue->readPointer);
 
     mutex_unlock(queue->bufferMutex);
@@ -41,7 +41,7 @@ void readFromQueue(Queue *queue, char *argBuf)
     mutex_lock(queue->bufferMutex);
    
     /*CRITICAL SECTION*/
-    receiveFromTaskQueue(queue->queue, queue->header, queue->bufferContent, sizeof(char));
+    receiveFromTaskQueue(queue->queue, queue->header, argBuf, sizeof(char));
     queue->readPointer = queuePointer_incr(queue->readPointer);
 
     mutex_unlock(queue->bufferMutex);
@@ -67,7 +67,7 @@ void writeIntoQueue(Queue *queue, const char *arg)
 	cancelDisable();
 
     /*CRITICAL SECTION*/
-    sendToTaskQueue(queue->queue, *(queue->header), queue->bufferContent, false);
+    sendToTaskQueue(queue->queue, *(queue->header), arg, false);
     queue->writePointer = bufferPointer_incr(queue->writePointer);
 
     mutex_unlock(queue->bufferMutex);
@@ -81,7 +81,7 @@ void writeIntoQueue(Queue *queue, const char *arg)
     mutex_lock(queue->bufferMutex);
 
     /*CRITICAL SECTION*/
-    sendToTaskQueue(queue->queue, *(queue->header), queue->bufferContent, false);
+    sendToTaskQueue(queue->queue, *(queue->header), arg, false);
     queue->writePointer = bufferPointer_incr(queue->writePointer);
 
     mutex_unlock(queue->bufferMutex);

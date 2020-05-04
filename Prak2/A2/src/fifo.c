@@ -9,7 +9,7 @@
 
 #include "fifo.h"
 
-
+FIFOBuffer *fifoBuffer;
 
 /* ============================================================================
 *  @brief   Initialize a FIFO buffer.
@@ -17,7 +17,7 @@
 */
 FIFOBuffer *make_FIFOBuffer()
 {
-    FIFOBuffer *fifoBuffer = (FIFOBuffer *)check_malloc(sizeof(FIFOBuffer));
+    fifoBuffer = (FIFOBuffer *)check_malloc(sizeof(FIFOBuffer));
     fifoBuffer->bufferContent = (char *)check_malloc(BUFFER_SIZE * sizeof(char));
     fifoBuffer->readPointer = 0;
     fifoBuffer->writePointer = 0;
@@ -44,7 +44,7 @@ FIFOBuffer *make_FIFOBuffer()
 *  @param   'fifoBuffer'  The buffer to work on
 *  @param   'letter'      The letter to be written in the buffer
 */
-void writeInFIFO(FIFOBuffer *fifoBuffer, char letter)
+void writeInFIFO(char letter)
 {
 
 #ifdef condition /*Conditional variables*/

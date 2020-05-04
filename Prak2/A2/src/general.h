@@ -20,7 +20,7 @@
 #include "taskQueue.h"
 
 
-#define condition                   0
+#define conditio                  0
 #define BUFFER_SIZE                 10
 #define THREE_SECONDS               3
 #define TWO_SECONDS                 2
@@ -71,7 +71,6 @@ typedef struct  /*FIFO BUFFER*/
 
 typedef struct  /*Queue*/
 {
-    char *bufferContent;
     int32_t readPointer;
     int32_t writePointer;
     int32_t length;

@@ -21,7 +21,7 @@
 *           print the letter and then pause for 2 seconds.
 *  @param   'thread'    Producer thread
 */
-void *producerHandler(CPThread *thread, char arg);
+void *producerHandler(CPThread *thread);
 
 
 
@@ -31,7 +31,7 @@ void *producerHandler(CPThread *thread, char arg);
 *  @param   'letter'        The letter to write
 *  @param   'thread'        Producer_1 or Producer_2
 */
-void producer(FIFOBuffer *fifoBuffer, char letter);
+void producer(char letter);
 
 
 

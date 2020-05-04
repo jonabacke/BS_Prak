@@ -24,9 +24,10 @@ void *consumerHandler(CPThread *thread)
     {
         char buffer;
         readFromQueue(thread->queue, &buffer);
-        (*thread->queue->header->routineForTask)(thread->fifoBuffer);
+        (*thread->queue->header->routineForTask)(&buffer);
         sleep(TWO_SECONDS);
     }
+    pthread_exit(NULL);
 }
 
 /* ============================================================================

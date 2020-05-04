@@ -9,19 +9,16 @@ pthread_t initProducerQueue(void *buffer)
 {
     mqd_t producerQueue = createTaskQueue("/producer", sizeProducerQueue, sizeof(char));
 
-    struct TaskHeader header;
-    header.argSize = sizeof(char);
-    header.routineForTask = &writeInFIFO;
-
     Queue *queue = check_malloc(sizeof(Queue));
     queue->length = sizeProducerQueue;
     queue->queue = producerQueue;
     queue->bufferMutex = make_mutex();
     queue->block = make_mutex();
     queue->header = check_malloc(sizeof(struct TaskHeader));
+    queue->header->routineForTask = writeInFIFO;
+    queue->header->argSize = sizeof(char);
     queue->readPointer = 0;
     queue->writePointer = 0;
-    queue->bufferContent = check_malloc(sizeof(char));
 #ifdef condition /*CONDITION VARIABLES*/
 
     queue->buffer_not_empty = make_cond();
@@ -51,7 +48,7 @@ void *runProducerQueue(Queue *queue)
         char arg = (char)getcharTimeout(1);
         printf("hi8 %c  \n", arg);
         mutex_lock(queue->block);
-        //sendToTaskQueue(producerQueue, header, &arg, false);
+        writeIntoQueue(queue, &arg);
         mutex_unlock(queue->block);
         printf("%c soll in den Stack gelegt werden\n", arg);
     }

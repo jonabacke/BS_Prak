@@ -16,15 +16,16 @@
 *           Producer_1 submits a lower case letter and Producer_2 an upper case letter.
 *  @param   'thread'    Producer thread
 */
-void *producerHandler(CPThread *thread, char arg)
+void *producerHandler(CPThread *thread)
 {
     printf("producerHandler entered\n");
+    char arg;
 
     //while (PRODUCER_THREAD_ACTIVE)
     while (1)
     {
-        readFromQueue(thread->queue, thread->fifoBuffer->bufferContent);
-        (*thread->queue->header->routineForTask)(thread->fifoBuffer);
+        readFromQueue(thread->queue, &arg);
+        (*thread->queue->header->routineForTask)(&arg);
         sleep(THREE_SECONDS);
     }
     pthread_exit(NULL);
@@ -36,7 +37,7 @@ void *producerHandler(CPThread *thread, char arg)
 *  @param   'letter'        The letter to write
 *  @param   'thread'        Producer_1 or Producer_2
 */
-void producer(FIFOBuffer *fifoBuffer, char letter)
+void producer(char letter)
 {
-    writeInFIFO(fifoBuffer, *(fifoBuffer->bufferContent));
+    writeInFIFO(letter);
 }
