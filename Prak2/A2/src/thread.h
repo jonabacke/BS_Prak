@@ -19,8 +19,8 @@
 
 
 
-void make_thread(pthread_t* thread, void *funktion, void *stack);
+void make_thread(pthread_t* thread, void *funktion, CPThread *t);
 
-CPThread *makeConsumerProducerThread(void *funktion, FIFOStack *stack);
+CPThread *makeConsumerProducerThread(void *funktion, FIFOStack *stack, int length, QueueStruct *queue);
 
 #endif

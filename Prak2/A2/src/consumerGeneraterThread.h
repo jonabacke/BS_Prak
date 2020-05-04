@@ -6,8 +6,8 @@
 
 
 #include "taskQueue.h"
-#include "getcharTimeout.c"
-#include "consumer.h"
+#include "getcharTimeout.h"
+#include "thread.h"
 #include "general.h"
 
-void initConsumerQueue();
+void *initConsumerQueue(void *stack);

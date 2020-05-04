@@ -1,2 +1,3 @@
-obj/consumer.d obj/consumer.o: src/consumer.c src/consumer.h \
- src/general.h src/sem.h src/mutex.h src/conditionVariable.h src/fifo.h
+obj/consumer.d obj/consumer.o: src/consumer.c src/consumer.h src/mutex.h \
+ src/thread.h src/general.h src/producer.h src/fifo.h src/sem.h \
+ src/conditionVariable.h

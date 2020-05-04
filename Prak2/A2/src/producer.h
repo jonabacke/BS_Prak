@@ -21,10 +21,8 @@
 
 
 
-void *producerOne(void *stack);
+void producerTask(CPThread *thread);
 
-void *producerTwo(void *stack);
-
-void producer(FIFOStack *stack);
+void *producer(CPThread *stack);
 
 #endif

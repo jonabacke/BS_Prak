@@ -9,9 +9,13 @@
 
 #include "general.h"
 
-CPThread *producerThreadOne = NULL;
-CPThread *producerThreadTwo = NULL;
-CPThread *consumerThreadOne = NULL;
+
+pthread_t threadControl = NULL;
+pthread_t producerQueue = NULL;
+pthread_t consumerQueue = NULL;
+
+Mutex *generateConsumerMutex = NULL;
+Mutex *generateProducerMutex = NULL;
 
 void *check_malloc(int size)
 {

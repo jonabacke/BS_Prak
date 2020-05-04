@@ -10,9 +10,13 @@
 #include <semaphore.h>
 #include <malloc.h>
 #include <errno.h>
+#include <mqueue.h>
 
 
-#define condition ;
+#define condition 
+#define sizeConsumerQueue 10 
+#define sizeProducerQueue 10 
+
 
 
 
@@ -23,45 +27,53 @@ typedef struct
 {
     char *array;
     int length;
-    int lengthProducer;
-    int lengthConsumer;
     int next_in;
     int next_out;
-    int next_inconsumerQueue;
-    int next_outconsumerQueue;
-    int next_inproducerQueue;
-    int next_outproducerQueue;
     Mutex *fifo;
-    Mutex *consumerQueue;
-    Mutex *producerQueue;
 #ifdef condition
     Cond *nonEmpty;
     Cond *nonFull;
-    Cond *nonEmptyQueueConsumer;
-    Cond *nonFullQueueConsumer;
-    Cond *nonEmptyQueueProducer;
-    Cond *nonFullQueueProducer;
 #else
     Semaphore *items;
     Semaphore *spaces;
-    Semaphore *itemsQueueProducer;
-    Semaphore *spacesQueueProducer;
-    Semaphore *itemsQueueConsumer;
-    Semaphore *spacesQueueConsumer;
 #endif // semaphor
 } FIFOStack;
+
+typedef struct 
+{
+    mqd_t schlange;
+    Mutex *queue;
+    int next_in;
+    int next_out;
+    int length;
+#ifdef condition
+    Cond *nonEmpty;
+    Cond *nonFull;
+#else
+    Semaphore *items;
+    Semaphore *spaces;
+#endif // semaphor
+} QueueStruct;
 
 typedef struct
 {
     pthread_t thread;
-    Mutex *pause;
+    FIFOStack *stack;
     int flag;
+    char value;
+    QueueStruct *queue;
+
 } CPThread;
 
-extern CPThread *producerThreadOne;
-extern CPThread *producerThreadTwo;
-extern CPThread *consumerThreadOne;
+
+
+
+extern Mutex *generateConsumerMutex;
+extern Mutex *generateProducerMutex;
+
 extern pthread_t threadControl;
+extern pthread_t producerQueue;
+extern pthread_t consumerQueue;
 
 void *check_malloc(int size);
 void cancelEnable();

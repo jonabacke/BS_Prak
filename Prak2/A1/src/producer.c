@@ -45,6 +45,7 @@ void *producerHandler(CPThread *thread)
         }
     }
     printf("%s wurde terminiert.\n", thread->name);
+    pthread_exit(NULL);
 }
 
 
@@ -57,10 +58,10 @@ void *producerHandler(CPThread *thread)
 void producer(FIFOBuffer *fifoBuffer, char letter, CPThread *thread)
 {
     mutex_lock(thread->pauseMutex);
-    pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
+    // pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
         writeInFIFO(fifoBuffer, letter);
-    pthread_cleanup_pop(1);
-    //mutex_unlock(thread->pauseMutex);
+    // pthread_cleanup_pop(1);
+    mutex_unlock(thread->pauseMutex);
 }
 
 

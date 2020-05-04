@@ -3,8 +3,8 @@
 
 
 CC = gcc
-CFLAGS = -Wall -O2
-LDFLAGS = -g -pthread
+CFLAGS = -Wall -O2 -Dcondition
+LDFLAGS = -g -pthread -lrt
 
 SRCDIR = src
 OBJDIR = obj

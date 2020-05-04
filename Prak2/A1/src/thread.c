@@ -24,9 +24,9 @@ pthread_t controlThread;
 *  @param   'function'      The function to work with.
 *  @param   'fifoBuffer'    The buffer to work with.
 */
-void make_thread(pthread_t *thread, void *function, void *fifoBuffer)
+void make_thread(pthread_t *thread, void *function, void *arg)
 {
-    int n = pthread_create(thread, NULL, function, fifoBuffer);
+    int n = pthread_create(thread, NULL, function, arg);
     HANDLE_ERR(n);
 }
 

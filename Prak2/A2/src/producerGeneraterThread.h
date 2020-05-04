@@ -6,8 +6,9 @@
 
 
 #include "taskQueue.h"
-#include "getcharTimeout.c"
-#include "producer.h"
+#include "getcharTimeout.h"
+#include "thread.h"
 #include "general.h"
 
-void initProducerQueue();
+void *initProducerQueue(void *stack);
+

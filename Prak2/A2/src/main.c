@@ -21,23 +21,16 @@
 
 
 
-pthread_t threadControl;
-pthread_t producerQueue;
-pthread_t consumerQueue;
 
 
 
 int main(int argc, char const *argv[])
 {
-    FIFOStack *stack = make_stack(stackSize, consumerQueueSize, producerQueueSize);
-    for (int i = 0; i < 5; i++)
-    {
-        makeConsumerProducerThread(producer, stack);
-        makeConsumerProducerThread(consumer, stack);
-    }
+    FIFOStack *stack = make_stack(stackSize);
     pthread_create(&threadControl, NULL, control, NULL);
-    pthread_create(&producerQueue, NULL, initConsumerQueue, NULL);
-    pthread_create(&consumerQueue, NULL, initProducerQueue, NULL);
+    pthread_create(&consumerQueue, NULL, initConsumerQueue, stack);
+    pthread_create(&producerQueue, NULL, initProducerQueue, stack);
+    sleep(1);
 
     pthread_join(threadControl, NULL);
     pthread_join(producerQueue, NULL);

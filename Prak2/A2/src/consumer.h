@@ -15,13 +15,13 @@
 #include "mutex.h"
 #include "conditionVariable.h"
 #include "fifo.h"
+#include "taskQueue.h"
 
 
 
-void consumer(FIFOStack *stack);
+void *consumer(CPThread *thread);
+char consumerTask(FIFOStack *stack);
 
-
-void *consumerOne(void *stack);
 
 
 

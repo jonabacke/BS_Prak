@@ -65,7 +65,7 @@ char readFromFIFO(FIFOBuffer *fifoBuffer);
 *  @param   'next'          Either the readPointer or the writePointer to increase.
 *  @return  'next'          Returns the correctly moved pointer.
 */
-int bufferPointer_incr(FIFOBuffer *fifoBuffer, int next);
+int bufferPointer_incr(int next);
 
 
 

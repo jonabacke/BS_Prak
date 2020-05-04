@@ -18,15 +18,17 @@
 
 typedef sem_t Semaphore;
 
-FIFOStack *make_stack(int length, int lengthConsumer, int lengthProducer);
+FIFOStack *make_stack(int length);
 
 
-int stack_incr(FIFOStack *stack, int next);
+int stack_incr(int length, int next);
 
 
 int stack_empty(FIFOStack *stack);
 
 
 int stack_full(FIFOStack *stack);
+
+int queue_full(QueueStruct *queue);
 
 #endif

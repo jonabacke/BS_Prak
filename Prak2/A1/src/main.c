@@ -19,7 +19,10 @@
 #include "thread.h"
 
 
-
+void cond_destroy(Cond *cond) {
+    int n = pthread_cond_destroy(cond);
+    HANDLE_ERR(n);
+}
 
 
 /* @brief   In the main the threads are created and at the end their remains destroyed.
@@ -31,11 +34,10 @@ int main(int argc, char const *argv[])
     producerThread_2 = makeConsumerProducerThread(producerHandler, fifoBuffer, "Producer_2");
     consumerThread = makeConsumerProducerThread(consumerHandler, fifoBuffer, "Consumer");
     pthread_create(&controlThread, NULL, control, NULL);
-
+    
     pthread_join(producerThread_1->thread, NULL);
     pthread_join(producerThread_2->thread, NULL);
     pthread_join(consumerThread->thread, NULL);
-    pthread_join(controlThread, NULL);
 
     
 
@@ -46,22 +48,16 @@ int main(int argc, char const *argv[])
             /*tc1-tc3 are cancelled in the control module*/
             int tc4 = pthread_cancel(controlThread);
             HANDLE_ERR(tc4);
-
             printf("Destroying Mutex.....\n");
-            int md1 = pthread_mutex_destroy(fifoBuffer->bufferMutex);
-            HANDLE_ERR(md1);
+            pthread_mutex_destroy(fifoBuffer->bufferMutex);
     
         #ifdef condition /*Conditional Variables*/
-           /*
-            int cd1 = cond_destroy(fifoBuffer->buffer_empty);
-            HANDLE_ERR(cd1);
-            int cd2 = cond_destroy(fifoBuffer->buffer_not_empty);
-            HANDLE_ERR(cd2);
-            int cd3 = cond_destroy(fifoBuffer->buffer_full);
-            HANDLE_ERR(cd3);
-            int cd4 = cond_destroy(fifoBuffer->buffer_not_full);
-            HANDLE_ERR(cd4);
-            */
+            // int cd1 = cond_destroy(fifoBuffer->buffer_empty);
+            // HANDLE_ERR(cd1);
+            cond_destroy(fifoBuffer->buffer_not_empty);
+            // int cd3 = cond_destroy(fifoBuffer->buffer_full);
+            // HANDLE_ERR(cd3);
+            cond_destroy(fifoBuffer->buffer_not_full);
         #else /*Semaphores*/
             printf("Destroying Semaphores.....\n");
             int sd1 = sem_destroy(fifoBuffer->buffer_elements);
@@ -72,9 +68,9 @@ int main(int argc, char const *argv[])
 
             printf("Freeing memory.....\n");
 		#ifdef condition /*Conditional Variables*/
-            free(fifoBuffer->buffer_empty);
+            // free(fifoBuffer->buffer_empty);
             free(fifoBuffer->buffer_not_empty);
-            free(fifoBuffer->buffer_full);
+            // free(fifoBuffer->buffer_full);
             free(fifoBuffer->buffer_not_full);
 		#else /*Semaphores*/
             free(fifoBuffer->buffer_elements);
@@ -87,6 +83,6 @@ int main(int argc, char const *argv[])
 
 
             printf("................ end of main process.\n");
-
+    pthread_join(controlThread, NULL);
     return EXIT_SUCCESS;
 }

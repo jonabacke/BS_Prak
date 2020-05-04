@@ -10,28 +10,25 @@
 
 #include "controler.h"
 
-
 void *control(void *not_used)
 {
     char eingabe;
+    int flagProducer = 1;
+    int flagConsumer = 1;
     while (1)
     {
-            sleep(3);
+        printf("hi9 \n");
         // eingabe einlesen
         scanf("%c", &eingabe);
         // reagieren
         switch (tolower(eingabe))
         {
-        case '1':
-            toggleThread(producerThreadOne);
-            break;
-
-        case '2':
-            toggleThread(producerThreadTwo);
+        case 'p':
+            flagProducer = toggleThread(generateProducerMutex, flagProducer);
             break;
 
         case 'c':
-            toggleThread(consumerThreadOne);
+            flagConsumer = toggleThread(generateConsumerMutex, flagConsumer);
             break;
 
         case 'q':
@@ -48,18 +45,19 @@ void *control(void *not_used)
         }
     }
 }
-void toggleThread(CPThread *stack)
+int toggleThread(Mutex *mutex, int flag)
 {
-    if (stack->flag)
+    if (flag)
     {
-        stack->flag = !(stack->flag);
-        mutex_lock(stack->pause);
+        flag = 0;
+        mutex_lock(mutex);
     }
     else
     {
-        stack->flag = !(stack->flag);
-        mutex_unlock(stack->pause);
+        flag = 1;
+        mutex_unlock(mutex);
     }
+    return flag;
 }
 
 void printCommands()
@@ -68,10 +66,11 @@ void printCommands()
         "\n\n -----------------------------------\n Commands:\n 1\t start / stop 'Producer_1'\n 2\t start / stop 'Producer_2'\n c / C\t start / stop 'Consumer'\n q / Q\t terminate the system\n h\t print commands\n------------------------------------\n\n\n ");
 }
 
-void cancelAll() 
+void cancelAll()
 {
-    pthread_cancel(producerThreadOne->thread);
-    pthread_cancel(producerThreadTwo->thread);
-    pthread_cancel(consumerThreadOne->thread);
-    // pthread_cancel(threadControl);
+    pthread_cancel(threadControl);
+    pthread_cancel(producerQueue);
+    pthread_cancel(consumerQueue);
+    toggleThread(generateProducerMutex, 0);
+    toggleThread(generateProducerMutex, 0);
 }

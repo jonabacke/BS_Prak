@@ -10,9 +10,9 @@
 #include "thread.h"
 
 
-void make_thread(pthread_t *thread, void *funktion, void *stack)
+void make_thread(pthread_t *thread, void *funktion, CPThread *t)
 {
-    int n = pthread_create(thread, NULL, funktion, stack);
+    int n = pthread_create(thread, NULL, funktion, t);
     if (n != 0)
     {
         perror("make_thread failed");
@@ -20,12 +20,15 @@ void make_thread(pthread_t *thread, void *funktion, void *stack)
     }
 }
 
-CPThread *makeConsumerProducerThread(void *funktion, FIFOStack *stack)
+CPThread *makeConsumerProducerThread(void *funktion, FIFOStack *stack, int length, QueueStruct *queue)
 {
     CPThread *thread = check_malloc(sizeof(CPThread));
-    make_thread(&(thread->thread), funktion, stack);
-    thread->pause = make_mutex();
+    make_thread(&(thread->thread), funktion, thread);
     thread->flag = 1;
+    thread->stack = stack;
+    thread->value = ' ';
+    thread->queue = queue;
+    
     return thread;    
 }
 

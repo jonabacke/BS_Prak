@@ -18,15 +18,15 @@
 FIFOBuffer *make_FIFOBuffer()
 {
     FIFOBuffer *fifoBuffer = (FIFOBuffer *)check_malloc(sizeof(FIFOBuffer));
-    fifoBuffer->bufferContent[BUFFER_SIZE] = (char *)check_malloc(BUFFER_SIZE * sizeof(char));
+    fifoBuffer->bufferContent = (char *)check_malloc(BUFFER_SIZE * sizeof(char));
     fifoBuffer->readPointer = 0;
     fifoBuffer->writePointer = 0;
     fifoBuffer->bufferLevel = 0;
     fifoBuffer->bufferMutex = make_mutex();
 #ifdef condition
-    fifoBuffer->buffer_empty = make_cond();
+    // fifoBuffer->buffer_empty = make_cond();
     fifoBuffer->buffer_not_empty = make_cond();
-    fifoBuffer->buffer_full = make_cond();
+    // fifoBuffer->buffer_full = make_cond();
     fifoBuffer->buffer_not_full = make_cond();
 #else
     fifoBuffer->buffer_elements = make_semaphore(0);
@@ -48,23 +48,23 @@ void writeInFIFO(FIFOBuffer *fifoBuffer, char letter)
 {
 
 #ifdef condition /*Conditional variables*/
-	cancelDisable();
     mutex_lock(fifoBuffer->bufferMutex);
     pthread_cleanup_push(cleanup_handler, fifoBuffer->bufferMutex);
     while (is_buffer_full(fifoBuffer))
     {
-        cond_wait(fifoBuffer->buffer_full, fifoBuffer->bufferMutex);                		//cond wait -> buffer full
+        cond_wait(fifoBuffer->buffer_not_full, fifoBuffer->bufferMutex);                		//cond wait -> buffer full
     }
+	cancelDisable();
 
     /*CRITICAL SECTION*/
     fifoBuffer->bufferContent[fifoBuffer->writePointer] = letter;                           // write letter in buffer
-    fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer, fifoBuffer->writePointer);    // set writepointer
+    fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer->writePointer);                // set writepointer
     fifoBuffer->bufferLevel ++;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
+    mutex_unlock(fifoBuffer->bufferMutex);
     pthread_cleanup_pop(1);
-    cond_signal(fifoBuffer->buffer_not_full);  												//cond signal -> buffer not full
-    //mutex_unlock(fifoBuffer->bufferMutex);
+    cond_signal(fifoBuffer->buffer_not_empty);  												//cond signal -> buffer not full
     cancelEnable();
 
 #else /*Semaphores*/
@@ -74,7 +74,7 @@ void writeInFIFO(FIFOBuffer *fifoBuffer, char letter)
 
     /*CRITICAL SECTION*/
     fifoBuffer->bufferContent[fifoBuffer->writePointer] = letter;                           // write letter in buffer
-    fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer, fifoBuffer->writePointer);    // set writepointer
+    fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer->writePointer);    // set writepointer
     fifoBuffer->bufferLevel ++;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
@@ -99,22 +99,22 @@ char readFromFIFO(FIFOBuffer *fifoBuffer)
     
 
 #ifdef condition /*Conditional Variables*/
-    cancelDisable();
     mutex_lock(fifoBuffer->bufferMutex);
     pthread_cleanup_push(cleanup_handler, fifoBuffer->bufferMutex);
     while (is_buffer_empty(fifoBuffer))
     {
-        cond_wait(fifoBuffer->buffer_empty, fifoBuffer->bufferMutex);                   // cond wait -> buffer empty
+        cond_wait(fifoBuffer->buffer_not_empty, fifoBuffer->bufferMutex);                   // cond wait -> buffer empty
     }
+    cancelDisable();
     /*CRITICAL SECTION*/
     letter = fifoBuffer->bufferContent[fifoBuffer->readPointer];                        // read letter from buffer
-    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer, fifoBuffer->readPointer);  // set readpointer
+    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);  // set readpointer
     fifoBuffer->bufferLevel--;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
+    mutex_unlock(fifoBuffer->bufferMutex);
     pthread_cleanup_pop(1);
-    cond_signal(fifoBuffer->buffer_not_empty);                                          // cond signal -> buffer not empty
-    //mutex_unlock(fifoBuffer->bufferMutex);
+    cond_signal(fifoBuffer->buffer_not_full);                                          // cond signal -> buffer not empty
     cancelEnable();
 
 #else /*Semaphores*/
@@ -124,7 +124,7 @@ char readFromFIFO(FIFOBuffer *fifoBuffer)
    
     /*CRITICAL SECTION*/
     letter = fifoBuffer->bufferContent[fifoBuffer->readPointer];                        // read letter from buffer
-    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer, fifoBuffer->readPointer);  // set readpointer
+    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);  // set readpointer
     fifoBuffer->bufferLevel--;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
@@ -147,7 +147,7 @@ char readFromFIFO(FIFOBuffer *fifoBuffer)
 *  @param   'next'          Either the readPointer or the writePointer to increase.
 *  @return  'next'          Returns the correctly moved pointer.
 */
-int bufferPointer_incr(FIFOBuffer *fifoBuffer, int next)
+int bufferPointer_incr(int next)
 {
     return (next + 1) % BUFFER_SIZE;
 }
@@ -175,7 +175,7 @@ int is_buffer_empty(FIFOBuffer *fifoBuffer)
 */
 int is_buffer_full(FIFOBuffer *fifoBuffer)
 {
-    return (bufferPointer_incr(fifoBuffer, fifoBuffer->writePointer) == fifoBuffer->readPointer);
+    return (bufferPointer_incr(fifoBuffer->writePointer) == fifoBuffer->readPointer);
 }
 
 

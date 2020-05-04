@@ -106,6 +106,9 @@ void cancelAll()
     HANDLE_ERR(tc2);
     int tc3 = pthread_cancel(consumerThread->thread);
     HANDLE_ERR(tc3);
+    toggleThread(producerThread_1);
+    toggleThread(producerThread_2);
+    toggleThread(consumerThread);
 }
 
 

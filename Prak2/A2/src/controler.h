@@ -16,7 +16,7 @@
 
 void *control(void *not_used);
 
-void toggleThread(CPThread *stack);
+int toggleThread(Mutex *mutex, int flag);
 
 void printCommands();
 

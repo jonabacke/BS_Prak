@@ -52,10 +52,10 @@ typedef sem_t Semaphore;
 
 typedef struct  /*FIFO BUFFER*/
 {
-    char *bufferContent[BUFFER_SIZE];
-    u_int8_t readPointer;
-    u_int8_t writePointer;
-    u_int8_t bufferLevel;
+    char *bufferContent;
+    int32_t readPointer;
+    int32_t writePointer;
+    int32_t bufferLevel;
     Mutex *bufferMutex;
 #ifdef condition /*CONDITION VARIABLES*/
     Cond *buffer_empty;

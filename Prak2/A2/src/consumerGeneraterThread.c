@@ -1,27 +1,38 @@
 
 #include "consumerGeneraterThread.h"
 
-#define queueSize 10
+#define queueSize 10;
 
-// TaskHeader *initTaskHeader() 
-// {
-//     TaskHeader *task = (TaskHeader *)check_malloc(sizeof(TaskHeader));
-//     task ->argSize = sizeof(char);
-//     task ->routineForTask = producer;
-//     return task;
-// }
-
-
-void initConsumerQueue() 
+void *initConsumerQueue(void *stack)
 {
-    mqd_t consumerQueue = createTaskQueue("/consumer", queueSize, sizeof(char));
-    // TaskHeader task = *initTaskHeader();
+    mqd_t consumerQueue = createTaskQueue("/consumer", sizeConsumerQueue, sizeof(char));
+    generateConsumerMutex = make_mutex();
+    struct TaskHeader header;
+    header.argSize = sizeof(char);
+    header.routineForTask = &consumerTask;
+
+    QueueStruct *queue = check_malloc(sizeof(QueueStruct));
+    queue->length = sizeConsumerQueue;
+    queue->next_in = 0;
+    queue->next_out = 0;
+    queue->nonEmpty = make_cond();
+    queue->nonFull = make_cond();
+    queue->schlange = consumerQueue;
+    queue->queue = make_mutex();
+
     char result;
+    for (int i = 0; i < 5; i++)
+    {
+        makeConsumerProducerThread(consumer, stack, sizeConsumerQueue, queue);
+    }
     while (1)
     {
-        sleep(1);
-        sendToTaskQueue(consumerQueue, NULL, &result, true);
+
+        printf("hi7 \n");
+        mutex_lock(generateConsumerMutex);
+        //sendToTaskQueue(consumerQueue, header, &result, false);
+        mutex_unlock(generateConsumerMutex);
         printf("%c aus dem Stack geholt\n", result);
+        sleep(1);
     }
-    
 }

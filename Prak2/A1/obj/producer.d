@@ -1,2 +1,3 @@
-obj/producer.d obj/producer.o: src/producer.c src/producer.h \
- src/general.h src/sem.h src/conditionVariable.h src/mutex.h src/fifo.h
+obj/producer.d obj/producer.o: src/producer.c src/producer.h src/fifo.h \
+ src/general.h src/sem.h src/thread.h src/mutex.h src/consumer.h \
+ src/conditionVariable.h
