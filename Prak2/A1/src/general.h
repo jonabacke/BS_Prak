@@ -19,7 +19,7 @@
 #include <errno.h>
 
 
-#define condition
+#define conditio
 #define BUFFER_SIZE                 10
 #define THREE_SECONDS               3
 #define TWO_SECONDS                 2

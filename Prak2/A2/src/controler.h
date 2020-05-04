@@ -1,25 +1,40 @@
 #ifndef CONTROLER_H
 #define CONTROLER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
 
-#include "general.h"
+#include <ctype.h> //tolower
 #include "mutex.h"
 
 
+
+/* ============================================================================
+*  @brief   Function used by the control thread. Reads key input, can pause 
+*           and terminate the created threads.
+*/
 void *control(void *not_used);
 
-int toggleThread(Mutex *mutex, int flag);
 
+
+/* ============================================================================
+*  @brief   Toggles (pauses) the producer or consumer threads.
+*  @param   Thread to be toggled.
+*/
+void toggleThread(CPThread *thread);
+
+
+
+/* ============================================================================
+*  @brief   Prints all available commands when 'h' key is pressed.
+*/
 void printCommands();
 
+
+
+/* ============================================================================
+*  @brief   Terminates the producer and consumer threads.
+*/
 void cancelAll();
 
-#endif
+
+
+#endif /*_CONTROLER_H*/

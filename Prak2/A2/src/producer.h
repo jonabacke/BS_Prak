@@ -1,28 +1,38 @@
+/* ============================================================================
+ * Name        : producer.h
+ * Author      : Jonathan Backes, Tobias Hardjowirogo
+ * Version     : 1.1
+ * Description : This file provides the produce function for the producer threads.
+ * ============================================================================
+ */
+
 
 #ifndef PRODUCER_H
 #define PRODUCER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
-
-#include "general.h"
-#include "sem.h"
-#include "conditionVariable.h"
-#include "mutex.h"
+#include <ctype.h> //tolower
 #include "fifo.h"
-#include "taskQueue.h"
 
 
 
+/* ============================================================================
+*  @brief   The Producer Handler keeps the Producer threads using the 'producer'
+*           function to write a letter from the alphabet to the FIFO buffer, 
+*           print the letter and then pause for 2 seconds.
+*  @param   'thread'    Producer thread
+*/
+void *producerHandler(CPThread *thread, char arg);
 
-void producerTask(CPThread *thread);
 
-void *producer(CPThread *stack);
 
-#endif
+/* ============================================================================
+*  @brief   A Producer thread uses this function to write a letter into the FIFO buffer.
+*  @param   'fifoBuffer'    The buffer to put the letter into.
+*  @param   'letter'        The letter to write
+*  @param   'thread'        Producer_1 or Producer_2
+*/
+void producer(FIFOBuffer *fifoBuffer, char letter);
+
+
+
+#endif /*_PRODUCER_H*/

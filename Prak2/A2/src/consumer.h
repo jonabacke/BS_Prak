@@ -1,28 +1,44 @@
-#ifndef CONSUMER_H
-#define CONSUMER_H
+/* ============================================================================
+ * Name        : consumer.h
+ * Author      : Jonathan Backes, Tobias Hardjowirogo
+ * Version     : 1.1
+ * Description : This file provides the consume function for the consumer thread.
+ * ============================================================================
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
+
+#ifndef _CONSUMER_H
+#define _CONSUMER_H
+
+
 
 #include "general.h"
-#include "sem.h"
-#include "mutex.h"
-#include "conditionVariable.h"
-#include "fifo.h"
-#include "taskQueue.h"
+#include "queue.h"
 
 
 
-void *consumer(CPThread *thread);
-char consumerTask(FIFOStack *stack);
+/* ============================================================================
+*  @brief   The Consumer Handler keeps the Consumer thread using the 'consumer'
+*           function to read a letter from the FIFO buffer, print the letter 
+*           and then pause for 3 seconds.
+*  @param   thread      Consumer thread
+*/
+void *consumerHandler(CPThread *thread);
 
 
 
+/* @brief   A Consumer thread uses this function to take a letter from the 
+*           FIFO buffer and print it. After reading the letter the thread takes 
+*           a break for 3 seconds.
+*  @param   fifoBuffer  The buffer to read the letter from.
+*  @param   thread      Consumer
+*/
+char consumer(FIFOBuffer *fifoBuffer);
 
-#endif
+
+
+//void unlockMutex(void *arg);
+
+
+
+#endif /*_CONSUMER_H*/

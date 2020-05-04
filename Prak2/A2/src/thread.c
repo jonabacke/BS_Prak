@@ -1,34 +1,87 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
+/* ============================================================================
+ * Name        : thread.c
+ * Author      : Jonathan Backes, Tobias Hardjowirogo
+ * Version     : 1.1
+ * Description : This file provides a function to initialize producer or consumer threads.
+ * ============================================================================
+ */
+
 
 #include "thread.h"
 
+#include <pthread.h>
 
-void make_thread(pthread_t *thread, void *funktion, CPThread *t)
+
+
+
+/* ============================================================================
+*  @brief   Creates a thread.
+*  @param   'thread'        The thread to create (producer/consumer/control).
+*  @param   'function'      The function to work with.
+*  @param   'fifoBuffer'    The buffer to work with.
+*/
+void make_thread(pthread_t *thread, void *function, void *arg)
 {
-    int n = pthread_create(thread, NULL, funktion, t);
-    if (n != 0)
-    {
-        perror("make_thread failed");
-        exit(EXIT_FAILURE);
-    }
+    int n = pthread_create(thread, NULL, function, arg);
+    HANDLE_ERR(n);
 }
 
-CPThread *makeConsumerProducerThread(void *funktion, FIFOStack *stack, int length, QueueStruct *queue)
+
+
+/* ============================================================================
+*  @brief   Initializes a producer or a consumer thread.
+*  @param   'function'      The function to work with (producerHandler/consumerHandler/control).
+*  @param   'fifoBuffer'    The buffer to read from or write on.
+*  @param   'name'          Name of the Thread
+*/
+CPThread *makeConsumerProducerThread(void *function, FIFOBuffer *fifoBuffer, Queue *queue)
 {
     CPThread *thread = check_malloc(sizeof(CPThread));
-    make_thread(&(thread->thread), funktion, thread);
-    thread->flag = 1;
-    thread->stack = stack;
-    thread->value = ' ';
+    make_thread(&(thread->thread), function, thread);
+    thread->fifoBuffer = fifoBuffer;
     thread->queue = queue;
-    
+    thread->flag = 1;
     return thread;    
 }
+
+
+
+/* ============================================================================
+*  @brief   Set cancel state (enable) with error handling.
+*/
+void cancelEnable()
+{
+    int scs = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    HANDLE_ERR(scs);
+}
+
+
+
+/* ============================================================================
+*  @brief   Set cancel state (disable) with error handling.
+*/
+void cancelDisable()
+{
+    int scs = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+    HANDLE_ERR(scs);
+}
+
+
+
+/* ============================================================================
+*  @brief   Function for allocating storage with error handling.
+*/
+void *check_malloc(int size)
+{
+    void *p = malloc(size);
+    if (p == NULL)
+    {
+        perror("malloc failed");
+        exit(EXIT_FAILURE);
+    }
+    return p;
+}
+
+
+
 

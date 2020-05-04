@@ -108,14 +108,14 @@ char readFromFIFO(FIFOBuffer *fifoBuffer)
     cancelDisable();
     /*CRITICAL SECTION*/
     letter = fifoBuffer->bufferContent[fifoBuffer->readPointer];                        // read letter from buffer
-    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);  // set readpointer
+    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
     mutex_unlock(fifoBuffer->bufferMutex);
+    cancelEnable();
     pthread_cleanup_pop(1);
     cond_signal(fifoBuffer->buffer_not_full);                                          // cond signal -> buffer not empty
-    cancelEnable();
 
 #else /*Semaphores*/
     semaphore_wait(fifoBuffer->buffer_elements);                                        // sem buffer elements down
@@ -124,7 +124,7 @@ char readFromFIFO(FIFOBuffer *fifoBuffer)
    
     /*CRITICAL SECTION*/
     letter = fifoBuffer->bufferContent[fifoBuffer->readPointer];                        // read letter from buffer
-    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);  // set readpointer
+    fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 

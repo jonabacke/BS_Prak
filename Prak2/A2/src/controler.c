@@ -1,38 +1,43 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/sem.h>
-#include <semaphore.h>
-#include <malloc.h>
-#include <errno.h>
-#include <ctype.h>
+/* ============================================================================
+ * @file        : controler.c
+ * @author      : Jonathan Backes, Tobias Hardjowirogo
+ * @version     : 1.1
+ * @brief       : This file provides the control thread which can control and 
+ *                terminate the threads.
+ * ============================================================================
+ */
+
 
 #include "controler.h"
+#include "general.h"
+ CPThread *producerQueue;
+ CPThread *consumerQueue;
 
+/* ============================================================================
+*  @brief   Function used by the control thread. Reads key input, can pause 
+*           and terminate the created threads.
+*/
 void *control(void *not_used)
 {
-    char eingabe;
-    int flagProducer = 1;
-    int flagConsumer = 1;
     while (1)
-    {
-        printf("hi9 \n");
-        // eingabe einlesen
-        scanf("%c", &eingabe);
-        // reagieren
-        switch (tolower(eingabe))
+    {   
+        /*READING AND EVALUATING KEY INPUT*/
+        char order = getchar();
+
+        switch (tolower(order))
         {
         case 'p':
-            flagProducer = toggleThread(generateProducerMutex, flagProducer);
+            toggleThread(producerQueue);
+            printf("--- toggle Producer_1\n");
             break;
 
         case 'c':
-            flagConsumer = toggleThread(generateConsumerMutex, flagConsumer);
+            toggleThread(consumerQueue);
+            printf("--- toggle consumer\n");
             break;
 
         case 'q':
-            printf("beende System");
+            printf("--- Programm wird beendet.\n");
             cancelAll();
             break;
 
@@ -45,32 +50,63 @@ void *control(void *not_used)
         }
     }
 }
-int toggleThread(Mutex *mutex, int flag)
+
+
+
+/* ============================================================================
+*  @brief   Toggles (pauses) the producer or consumer threads.
+*  @param   Thread to be toggled.
+*/
+void toggleThread(CPThread *thread)
 {
-    if (flag)
+    if (thread->flag)
     {
-        flag = 0;
-        mutex_lock(mutex);
+        thread->flag = TURN_OFF;
+        mutex_lock(thread->queue->block);
     }
     else
     {
-        flag = 1;
-        mutex_unlock(mutex);
+        thread->flag = TURN_ON;
+        mutex_unlock(thread->queue->block);
     }
-    return flag;
 }
 
+
+
+/* ============================================================================
+*  @brief   Prints all available commands when 'h' key is pressed.
+*/
 void printCommands()
 {
-    printf(
-        "\n\n -----------------------------------\n Commands:\n 1\t start / stop 'Producer_1'\n 2\t start / stop 'Producer_2'\n c / C\t start / stop 'Consumer'\n q / Q\t terminate the system\n h\t print commands\n------------------------------------\n\n\n ");
+    printf( "\n\n -----------------------------------\n" 
+            "Commands:\n"
+            "1\t start/stop 'Producer_1'\n"
+            "2\t start/stop 'Producer_2'\n" 
+            "c/C\t start/stop 'Consumer'\n"
+            "q/Q\t terminate the system\n" 
+            "h\t print commands\n"
+            "------------------------------------\n\n\n ");
 }
 
-void cancelAll()
+
+
+/* ============================================================================
+*  @brief   Terminates the producer and consumer threads.
+*/
+void cancelAll() 
 {
-    pthread_cancel(threadControl);
-    pthread_cancel(producerQueue);
-    pthread_cancel(consumerQueue);
-    toggleThread(generateProducerMutex, 0);
-    toggleThread(generateProducerMutex, 0);
+	printf("cancelAll wird betreten \n");
+    // int tc1 = pthread_cancel(producerThread_1->thread);
+    // HANDLE_ERR(tc1);
+    // int tc2 = pthread_cancel(producerThread_2->thread);
+    // HANDLE_ERR(tc2);
+    // int tc3 = pthread_cancel(consumerThread->thread);
+    // HANDLE_ERR(tc3);
+    // toggleThread(producerThread_1);
+    // toggleThread(producerThread_2);
+    // toggleThread(consumerThread);
 }
+
+
+
+

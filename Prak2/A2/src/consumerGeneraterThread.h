@@ -8,6 +8,11 @@
 #include "taskQueue.h"
 #include "getcharTimeout.h"
 #include "thread.h"
-#include "general.h"
 
-void *initConsumerQueue(void *stack);
+#define queueSize 10
+#define sizeConsumerQueue 10
+
+
+pthread_t initConsumerQueue(void *stack);
+
+void *runConsumerQueue(Queue *queue);

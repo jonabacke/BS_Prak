@@ -8,7 +8,7 @@
 #include "taskQueue.h"
 #include "getcharTimeout.h"
 #include "thread.h"
-#include "general.h"
 
-void *initProducerQueue(void *stack);
+pthread_t initProducerQueue(void *stack);
+void *runProducerQueue(Queue *queue);
 

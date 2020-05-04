@@ -6,10 +6,7 @@
  * ============================================================================
  */
 
-
 #include "consumer.h"
-
-
 
 /* ============================================================================
 *  @brief   The Consumer Handler keeps the Consumer thread using the 'consumer'
@@ -18,7 +15,7 @@
 *  @param   thread      Consumer thread
 */
 void *consumerHandler(CPThread *thread)
-{   
+{
     while (CONSUMER_THREAD_ACTIVE)
     {
         printf("%s nimmt %c aus Puffer \n", thread->name, consumer(thread->fifoBuffer, thread));
@@ -26,8 +23,6 @@ void *consumerHandler(CPThread *thread)
     }
     printf("%s wurde terminiert.\n", thread->name);
 }
-
-
 
 /* ============================================================================
 *  @brief   A Consumer thread uses this function to take a letter from the 
@@ -40,7 +35,7 @@ char consumer(FIFOBuffer *fifoBuffer, CPThread *thread)
 {
     printf("consumer active\n");
     char letter;
-    
+
     mutex_lock(thread->pauseMutex);
     pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
     letter = readFromFIFO(fifoBuffer);
@@ -49,7 +44,3 @@ char consumer(FIFOBuffer *fifoBuffer, CPThread *thread)
 
     return letter;
 }
-
-
-
-

@@ -10,7 +10,7 @@ SRCDIR = src
 OBJDIR = obj
 TEST = test
 BINDIR = bin
-EXEFILES = main
+EXEFILES = aufgabe2
 
 srcfiles = $(wildcard $(SRCDIR)/*.c)
 objfiles = $(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(srcfiles:.c=.o))

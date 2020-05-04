@@ -6,10 +6,7 @@
  * ============================================================================
  */
 
-
 #include "producer.h"
-
-
 
 /* ============================================================================
 *  @brief   The Producer Handler keeps the Producer threads using the 'producer'
@@ -22,12 +19,12 @@ void *producerHandler(CPThread *thread)
 {
     printf("producerhandler entered\n");
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    
+
     //while (PRODUCER_THREAD_ACTIVE)
-    while(thread->flag)
+    while (thread->flag)
     {
         char letter;
-        
+
         for (int i = 0; i < sizeof(alphabet); i++)
         {
             if (producerThread_1 == thread)
@@ -38,7 +35,7 @@ void *producerHandler(CPThread *thread)
             {
                 letter = alphabet[i];
             }
-            
+
             producer(thread->fifoBuffer, letter, thread);
             printf("%s schreibt %c in Puffer \n", thread->name, letter);
             sleep(TWO_SECONDS);
@@ -47,7 +44,6 @@ void *producerHandler(CPThread *thread)
     printf("%s wurde terminiert.\n", thread->name);
     pthread_exit(NULL);
 }
-
 
 /* ============================================================================
 *  @brief   A Producer thread uses this function to write a letter into the FIFO buffer.
@@ -58,10 +54,8 @@ void *producerHandler(CPThread *thread)
 void producer(FIFOBuffer *fifoBuffer, char letter, CPThread *thread)
 {
     mutex_lock(thread->pauseMutex);
-    // pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
-        writeInFIFO(fifoBuffer, letter);
-    // pthread_cleanup_pop(1);
+    pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
+    writeInFIFO(fifoBuffer, letter);
+    pthread_cleanup_pop(1);
     mutex_unlock(thread->pauseMutex);
 }
-
-
