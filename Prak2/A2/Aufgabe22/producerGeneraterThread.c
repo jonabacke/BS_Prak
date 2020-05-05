@@ -20,6 +20,7 @@ pthread_t initProducerQueue(void)
     queue->header->argSize = sizeof(char);
     queue->readPointer = 0;
     queue->writePointer = 0;
+    queue->flag = 1;
 #ifdef condition /*CONDITION VARIABLES*/
 
     queue->buffer_not_empty = make_cond();
@@ -30,7 +31,7 @@ pthread_t initProducerQueue(void)
 
 #endif
 
-    CPThread *threads[POOLSIZE];
+    pthread_t *threads[POOLSIZE];
 
     for (int i = 0; i < POOLSIZE; i++)
     {
@@ -38,7 +39,7 @@ pthread_t initProducerQueue(void)
     }
 
     pthread_t producerThread;
-    make_thread(&producerThread, runProducerQueue, queue);
+    make_thread(producerThread, runProducerQueue, queue);
     return producerThread;
 }
 

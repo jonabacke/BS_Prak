@@ -16,7 +16,7 @@
 #include "consumerGeneraterThread.h"
 #include "producerGeneraterThread.h"
 
-pthread_t *threadControl;
+pthread_t threadControl;
 
 void cond_destroy(Cond *cond)
 {

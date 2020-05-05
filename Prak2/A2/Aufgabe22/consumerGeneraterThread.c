@@ -13,11 +13,12 @@ pthread_t initConsumerQueue()
     queue->queue = consumerQueue;
     queue->bufferMutex = make_mutex();
     queue->header = check_malloc(sizeof(struct TaskHeader));
-    queue->header->routineForTask = readFromFIFO;
+    queue->header->routineForTask = &readFromFIFO;
     queue->header->argSize = sizeof(FIFOBuffer);
     queue->readPointer = 0;
     queue->writePointer = 0;
     queue->block = make_mutex();
+    queue->flag = 1;
 #ifdef condition /*CONDITION VARIABLES*/
     queue->buffer_not_empty = make_cond();
     queue->buffer_not_full = make_cond();

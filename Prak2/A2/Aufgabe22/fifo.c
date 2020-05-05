@@ -96,7 +96,6 @@ void writeInFIFO(char letter)
 void readFromFIFO(char *letter)
 {
     
-
 #ifdef condition /*Conditional Variables*/
     mutex_lock(fifoBuffer->bufferMutex);
     pthread_cleanup_push(cleanup_handler, fifoBuffer->bufferMutex);

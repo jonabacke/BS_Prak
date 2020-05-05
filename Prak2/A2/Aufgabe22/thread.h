@@ -23,7 +23,7 @@
 *  @param   'function'      The function to work with (producerHandler/consumerHandler/control).
 *  @param   'fifoBuffer'    The buffer to work with.
 */
-void make_thread(pthread_t* thread, void *function, void *fifoBuffer);
+void make_thread(pthread_t thread, void *function, void *fifoBuffer);
 
 
 

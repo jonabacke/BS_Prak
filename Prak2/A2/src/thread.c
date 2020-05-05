@@ -22,6 +22,7 @@
 */
 void make_thread(pthread_t *thread, void *function, void *arg)
 {
+    printf("generate Thread \n");
     int n = pthread_create(thread, NULL, function, arg);
     HANDLE_ERR(n);
 }
@@ -34,13 +35,10 @@ void make_thread(pthread_t *thread, void *function, void *arg)
 *  @param   'fifoBuffer'    The buffer to read from or write on.
 *  @param   'name'          Name of the Thread
 */
-CPThread *makeConsumerProducerThread(void *function, FIFOBuffer *fifoBuffer, Queue *queue)
+pthread_t makeConsumerProducerThread(void *function,  Queue *queue)
 {
-    CPThread *thread = check_malloc(sizeof(CPThread));
-    make_thread(&(thread->thread), function, thread);
-    thread->fifoBuffer = fifoBuffer;
-    thread->queue = queue;
-    thread->flag = 1;
+    pthread_t thread;
+    make_thread(thread, function, queue);
     return thread;    
 }
 

@@ -62,7 +62,7 @@ void toggleThread(CPThread *thread)
     if (thread->flag)
     {
         thread->flag = TURN_OFF;
-        mutex_lock(producerqueue->block);
+        mutex_lock(thread->queue->block);
     }
     else
     {
