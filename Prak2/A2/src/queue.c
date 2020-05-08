@@ -4,12 +4,8 @@
 
 
 
-int is_queue_full(Queue *queue);
-int is_queue_empty(Queue *queue);
-int queuePointer_incr(int next);
 
-
-
+#define QUEUE_SIZE 		10
 
 
 
@@ -66,8 +62,8 @@ void writeIntoQueue(Queue *queue, const char *arg)
 	cancelDisable();
 
     /*CRITICAL SECTION*/
-    sendToTaskQueue(queue->queue, *(queue->header), arg, false);
-    queue->writePointer = bufferPointer_incr(queue->writePointer);
+    sendToTaskQueue(queue->queue, *(queue->header), arg, 0);
+    queue->writePointer = queuePointer_incr(queue->writePointer);
 
     mutex_unlock(queue->bufferMutex);
     pthread_cleanup_pop(1);
@@ -80,8 +76,8 @@ void writeIntoQueue(Queue *queue, const char *arg)
     mutex_lock(queue->bufferMutex);
 
     /*CRITICAL SECTION*/
-    sendToTaskQueue(queue->queue, *(queue->header), arg, false);
-    queue->writePointer = bufferPointer_incr(queue->writePointer);
+    sendToTaskQueue(queue->queue, *(queue->header), arg, 0);
+    queue->writePointer = queuePointer_incr(queue->writePointer);
 
     mutex_unlock(queue->bufferMutex);
     cancelEnable();

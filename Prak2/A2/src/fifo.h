@@ -33,7 +33,7 @@ FIFOBuffer *make_FIFOBuffer(void);
 *  @param   'fifoBuffer'  The buffer to work on
 *  @param   'letter'      The letter to be written in the buffer
 */
-void writeInFIFO(char letter);
+void writeInFIFO(void *letter);
 
 
 
@@ -43,7 +43,7 @@ void writeInFIFO(char letter);
 *  @param   'fifoBuffer'    The buffer to work on
 *  @return  'letter'        Returns the letter that has been read from the FIFO buffer.
 */
-void readFromFIFO(char *letter);
+void readFromFIFO(void *letter);
 
 
 

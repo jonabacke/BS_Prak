@@ -78,6 +78,7 @@ typedef struct  /*Queue*/
     mqd_t queue;
     struct TaskHeader *header;
     Mutex *block;
+    int flag;
 #ifdef condition /*CONDITION VARIABLES*/
     Cond *buffer_not_empty;
     Cond *buffer_not_full;
@@ -88,18 +89,15 @@ typedef struct  /*Queue*/
 } Queue;
 
 
-typedef struct /*THREAD*/
-{
-    pthread_t thread;
-    FIFOBuffer *fifoBuffer;
-    Queue *queue;
-    u_int8_t flag;
-} CPThread;
+//typedef struct /*THREAD*/
+//{
+//    pthread_t thread;
+//    FIFOBuffer *fifoBuffer;
+//    Queue *queue;
+//    u_int8_t flag;
+//} CPThread;
 
 
-/*Declaration of threads for extern*/
-extern CPThread *producerQueue;
-extern CPThread *consumerQueue;
 
 
 

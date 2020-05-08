@@ -12,6 +12,7 @@
 
 #include <ctype.h> //tolower
 #include "fifo.h"
+#include "queue.h"
 
 
 
@@ -21,7 +22,7 @@
 *           print the letter and then pause for 2 seconds.
 *  @param   'thread'    Producer thread
 */
-void *producerHandler(CPThread *thread);
+void *producerHandler(Queue *queue);
 
 
 
@@ -31,7 +32,7 @@ void *producerHandler(CPThread *thread);
 *  @param   'letter'        The letter to write
 *  @param   'thread'        Producer_1 or Producer_2
 */
-void producer(char letter);
+void producer(char *letter);
 
 
 

@@ -35,50 +35,19 @@ void make_thread(pthread_t *thread, void *function, void *arg)
 *  @param   'fifoBuffer'    The buffer to read from or write on.
 *  @param   'name'          Name of the Thread
 */
-pthread_t makeConsumerProducerThread(void *function,  Queue *queue)
-{
-    pthread_t thread;
-    make_thread(thread, function, queue);
-    return thread;    
-}
+//pthread_t makeConsumerProducerThread(void *function,  Queue *queue)
+//{
+//    pthread_t thread;
+//    make_thread(thread, function, queue);
+//    return thread;
+//}
 
 
 
-/* ============================================================================
-*  @brief   Set cancel state (enable) with error handling.
-*/
-void cancelEnable()
-{
-    int scs = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-    HANDLE_ERR(scs);
-}
 
 
 
-/* ============================================================================
-*  @brief   Set cancel state (disable) with error handling.
-*/
-void cancelDisable()
-{
-    int scs = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-    HANDLE_ERR(scs);
-}
 
-
-
-/* ============================================================================
-*  @brief   Function for allocating storage with error handling.
-*/
-void *check_malloc(int size)
-{
-    void *p = malloc(size);
-    if (p == NULL)
-    {
-        perror("malloc failed");
-        exit(EXIT_FAILURE);
-    }
-    return p;
-}
 
 
 

@@ -16,7 +16,7 @@
 #include "consumerGeneraterThread.h"
 #include "producerGeneraterThread.h"
 
-pthread_t *threadControl;
+pthread_t threadControl;
 
 void cond_destroy(Cond *cond)
 {
@@ -34,13 +34,9 @@ int main(int argc, char const *argv[])
     sleep(1);
     // FIFOBuffer *fifoBuffer = 
     make_FIFOBuffer();
-    make_thread(threadControl, control, NULL);
+    make_thread(&threadControl, control, NULL);
 
-    pthread_t consumerThread = initConsumerQueue();
-    pthread_t producerThread = initProducerQueue();
-
-    pthread_join(consumerThread, NULL);
-    pthread_join(producerThread, NULL);
+    pthread_join(threadControl, NULL);
 
 
 

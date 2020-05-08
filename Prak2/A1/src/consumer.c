@@ -38,9 +38,9 @@ char consumer(FIFOBuffer *fifoBuffer, CPThread *thread)
 
     mutex_lock(thread->pauseMutex);
     pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
-    letter = readFromFIFO(fifoBuffer);
     pthread_cleanup_pop(1);
     mutex_unlock(thread->pauseMutex);
+    letter = readFromFIFO(fifoBuffer);
 
     return letter;
 }

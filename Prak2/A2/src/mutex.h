@@ -11,7 +11,8 @@
 #define _MUTEX_H
 
 
-#include "thread.h"
+#include <pthread.h>
+#include "general.h"
 
 
 typedef pthread_mutex_t Mutex;
@@ -45,6 +46,26 @@ void mutex_unlock(Mutex *mutex);
 *           in case of a thread canceling while the buffer is locked.
 */
 void cleanup_handler(void *p);
+
+
+
+/* ============================================================================
+*  @brief   Function for allocating storage with error handling.
+*/
+void *check_malloc(int size);
+
+
+/* ============================================================================
+*  @brief   Set cancel state (enable) with error handling.
+*/
+void cancelEnable(void);
+
+
+
+/* ============================================================================
+*  @brief   Set cancel state (disable) with error handling.
+*/
+void cancelDisable(void);
 
 
 

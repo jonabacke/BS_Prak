@@ -55,7 +55,7 @@ void producer(FIFOBuffer *fifoBuffer, char letter, CPThread *thread)
 {
     mutex_lock(thread->pauseMutex);
     pthread_cleanup_push(cleanup_handler, thread->pauseMutex);
-    writeInFIFO(fifoBuffer, letter);
     pthread_cleanup_pop(1);
     mutex_unlock(thread->pauseMutex);
+    writeInFIFO(fifoBuffer, letter);
 }

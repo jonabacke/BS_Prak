@@ -5,7 +5,7 @@
 #define sizeProducerQueue 10
 #define POOLSIZE 5
 
-pthread_t initProducerQueue(void)
+Queue *initProducerQueue(void)
 {
     printf("generateProducerQueue\n");
     mqd_t producerQueue = createTaskQueue("/producer", sizeProducerQueue, sizeof(char));
@@ -20,8 +20,8 @@ pthread_t initProducerQueue(void)
     queue->header->argSize = sizeof(char);
     queue->readPointer = 0;
     queue->writePointer = 0;
+    queue->flag = TURN_ON;
 #ifdef condition /*CONDITION VARIABLES*/
-
     queue->buffer_not_empty = make_cond();
     queue->buffer_not_full = make_cond();
 #else /*SEMAPHORES*/
@@ -29,17 +29,7 @@ pthread_t initProducerQueue(void)
     queue->buffer_capacity = make_semaphore(sizeProducerQueue - 1);
 
 #endif
-
-    CPThread *threads[POOLSIZE];
-
-    for (int i = 0; i < POOLSIZE; i++)
-    {
-        threads[i] = makeConsumerProducerThread(producerHandler, queue);
-    }
-
-    pthread_t producerThread;
-    make_thread(&producerThread, runProducerQueue, queue);
-    return producerThread;
+    return queue;
 }
 
 void *runProducerQueue(Queue *queue)

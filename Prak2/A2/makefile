@@ -3,7 +3,7 @@
 
 
 CC = gcc
-CFLAGS = -Wall -O2 -Dcondition  -Wextra
+CFLAGS = -Wall -O2 -Dcondition  
 LDFLAGS = -g -pthread -lrt
 
 SRCDIR = src

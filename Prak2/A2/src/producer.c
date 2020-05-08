@@ -9,6 +9,8 @@
 #include "producer.h"
 
 #include <unistd.h>
+
+#define THREE_SECONDS		3
 /* ============================================================================
 *  @brief   The Producer Handler keeps the Producer threads using the 'producer'
 *           function to write a letter from the alphabet to the FIFO buffer,
@@ -16,7 +18,7 @@
 *           Producer_1 submits a lower case letter and Producer_2 an upper case letter.
 *  @param   'thread'    Producer thread
 */
-void *producerHandler(CPThread *thread)
+void *producerHandler(Queue *queue)
 {
     printf("producerHandler entered\n");
     char arg;
@@ -24,8 +26,8 @@ void *producerHandler(CPThread *thread)
     //while (PRODUCER_THREAD_ACTIVE)
     while (1)
     {
-        readFromQueue(thread->queue, &arg);
-        (*thread->queue->header->routineForTask)(&arg);
+        readFromQueue(queue, &arg);
+        (*queue->header->routineForTask)(&arg);
         sleep(THREE_SECONDS);
     }
     pthread_exit(NULL);
@@ -37,7 +39,8 @@ void *producerHandler(CPThread *thread)
 *  @param   'letter'        The letter to write
 *  @param   'thread'        Producer_1 or Producer_2
 */
-void producer(char letter)
+void producer(char *letter)
 {
+	printf("Schreibe %c in FIFO\n", *letter);
     writeInFIFO(letter);
 }

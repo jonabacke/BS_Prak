@@ -10,8 +10,18 @@
 
 #include "controler.h"
 #include "general.h"
- int producerQueue = TURN_ON;
- int consumerQueue = TURN_ON;
+
+#define AMOUNTPRODUCER 	5
+#define AMOUNTCONSUMER	5
+
+Queue *producerQueue;
+Queue *consumerQueue;
+
+pthread_t producerGenerator;
+pthread_t consumerGenerator;
+
+pthread_t producerThread[AMOUNTPRODUCER];
+pthread_t consumerThread[AMOUNTCONSUMER];
 
 /* ============================================================================
 *  @brief   Function used by the control thread. Reads key input, can pause 
@@ -19,6 +29,21 @@
 */
 void *control(void *not_used)
 {
+	producerQueue = initProducerQueue();
+	consumerQueue = initConsumerQueue();
+
+	make_thread(&producerGenerator, runProducerQueue, producerQueue);
+	make_thread(&consumerGenerator, runConsumerQueue, consumerQueue);
+
+	for (int i = 0; i < AMOUNTPRODUCER; ++ i) {
+		make_thread(&producerThread[i], producerHandler, producerQueue);
+	}
+
+	for (int i = 0; i < AMOUNTCONSUMER; ++ i) {
+		make_thread(&consumerThread[i], consumerHandler, consumerQueue);
+	}
+
+
     while (1)
     {   
         /*READING AND EVALUATING KEY INPUT*/
@@ -57,17 +82,17 @@ void *control(void *not_used)
 *  @brief   Toggles (pauses) the producer or consumer threads.
 *  @param   Thread to be toggled.
 */
-void toggleThread(CPThread *thread)
+void toggleThread(Queue *queue)
 {
-    if (thread->flag)
+    if (queue->flag)
     {
-        thread->flag = TURN_OFF;
-        mutex_lock(producerqueue->block);
+    	queue->flag = TURN_OFF;
+        mutex_lock(queue->block);
     }
     else
     {
-        thread->flag = TURN_ON;
-        mutex_unlock(thread->queue->block);
+    	queue->flag = TURN_ON;
+        mutex_unlock(queue->block);
     }
 }
 
@@ -96,15 +121,37 @@ void printCommands()
 void cancelAll() 
 {
 	printf("cancelAll wird betreten \n");
-    // int tc1 = pthread_cancel(producerThread_1->thread);
-    // HANDLE_ERR(tc1);
-    // int tc2 = pthread_cancel(producerThread_2->thread);
-    // HANDLE_ERR(tc2);
-    // int tc3 = pthread_cancel(consumerThread->thread);
-    // HANDLE_ERR(tc3);
-    // toggleThread(producerThread_1);
-    // toggleThread(producerThread_2);
-    // toggleThread(consumerThread);
+    if (producerQueue->flag == TURN_OFF)
+    {
+        toggleThread(producerQueue);
+    }
+    if (consumerQueue->flag == TURN_OFF)
+    {
+        toggleThread(consumerQueue);
+    }
+    int tc1 = pthread_cancel(producerGenerator);
+    HANDLE_ERR(tc1);
+    int tc2 = pthread_cancel(consumerGenerator);
+    HANDLE_ERR(tc2);
+
+	for (int i = 0; i < AMOUNTPRODUCER; ++ i) {
+		int tc3 = pthread_cancel(producerThread[i]);
+	    HANDLE_ERR(tc3);
+	}
+
+	for (int i = 0; i < AMOUNTCONSUMER; ++ i) {
+		int tc4 = pthread_cancel(consumerThread[i]);
+	    HANDLE_ERR(tc4);
+	}
+
+    deleteAll();
+    pthread_exit(NULL);
+}
+
+
+void deleteAll()
+{
+	// delete all mellocs,mutex sem...
 }
 
 

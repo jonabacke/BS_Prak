@@ -11,7 +11,7 @@
 #define _SEM_H
 
 
-#include "thread.h"
+#include "mutex.h"
 
 
 

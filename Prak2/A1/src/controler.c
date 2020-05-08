@@ -11,6 +11,9 @@
 #include "controler.h"
 
 
+CPThread *producerThread_1;
+CPThread *producerThread_2;
+CPThread *consumerThread;
 
 /* ============================================================================
 *  @brief   Function used by the control thread. Reads key input, can pause 
@@ -46,7 +49,7 @@ void *control(void *not_used)
             break;
 
         case 'h':
-            printCommands();
+            printCommands(producerThread_1, producerThread_2, consumerThread);
             break;
 
         default:
@@ -82,7 +85,7 @@ void toggleThread(CPThread *thread)
 */
 void printCommands()
 {
-    printf( "\n\n -----------------------------------\n" 
+    printf( "\n\n------------------------------------\n"
             "Commands:\n"
             "1\t start/stop 'Producer_1'\n"
             "2\t start/stop 'Producer_2'\n" 
@@ -106,9 +109,18 @@ void cancelAll()
     HANDLE_ERR(tc2);
     int tc3 = pthread_cancel(consumerThread->thread);
     HANDLE_ERR(tc3);
-    toggleThread(producerThread_1);
-    toggleThread(producerThread_2);
-    toggleThread(consumerThread);
+    if (producerThread_1->flag == TURN_OFF)
+    {
+        toggleThread(producerThread_1);
+    }
+    if (producerThread_2->flag == TURN_OFF)
+    {
+        toggleThread(producerThread_2);
+    }
+    if (consumerThread->flag == TURN_OFF)
+    {
+        toggleThread(consumerThread);
+    }
 }
 
 

@@ -4,6 +4,10 @@
 
 #include <ctype.h> //tolower
 #include "mutex.h"
+#include "consumerGeneraterThread.h"
+#include "producerGeneraterThread.h"
+#include "producer.h"
+#include "consumer.h"
 
 
 
@@ -19,7 +23,7 @@ void *control(void *not_used);
 *  @brief   Toggles (pauses) the producer or consumer threads.
 *  @param   Thread to be toggled.
 */
-void toggleThread(CPThread *thread);
+void toggleThread(Queue *queue);
 
 
 
@@ -35,6 +39,6 @@ void printCommands();
 */
 void cancelAll();
 
-
+void deleteAll();
 
 #endif /*_CONTROLER_H*/

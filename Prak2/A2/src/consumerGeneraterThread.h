@@ -7,12 +7,12 @@
 
 #include "taskQueue.h"
 #include "getcharTimeout.h"
-#include "thread.h"
+#include "queue.h"
 
 #define queueSize 10
 #define sizeConsumerQueue 10
 
 
-pthread_t initConsumerQueue(void);
+Queue *initConsumerQueue(void);
 
 void *runConsumerQueue(Queue *queue);

@@ -9,7 +9,6 @@
 
 #include "mutex.h"
 
-void *check_malloc(int size);
 /* ============================================================================
 *  @brief   This function creates a Mutex.
 *  @return  'mutex'     Returns a Mutex
@@ -56,7 +55,39 @@ void cleanup_handler(void *p)
 }
 
 
+/* ============================================================================
+*  @brief   Function for allocating storage with error handling.
+*/
+void *check_malloc(int size)
+{
+    void *p = malloc(size);
+    if (p == NULL)
+    {
+        perror("malloc failed");
+        EXIT_FAILURE;
+    }
+    return p;
+}
 
+
+/* ============================================================================
+*  @brief   Set cancel state (enable) with error handling.
+*/
+void cancelEnable()
+{
+    int scs = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    HANDLE_ERR(scs);
+}
+
+
+/* ============================================================================
+*  @brief   Set cancel state (disable) with error handling.
+*/
+void cancelDisable()
+{
+    int scs = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+    HANDLE_ERR(scs);
+}
 
 
 

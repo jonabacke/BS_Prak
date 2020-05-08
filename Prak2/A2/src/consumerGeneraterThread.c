@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "consumer.h"
 
-pthread_t initConsumerQueue()
+Queue *initConsumerQueue()
 {
     printf("generateConsumerQueue\n");
     mqd_t consumerQueue = createTaskQueue("/consumer", sizeConsumerQueue, sizeof(char));
@@ -18,6 +18,7 @@ pthread_t initConsumerQueue()
     queue->readPointer = 0;
     queue->writePointer = 0;
     queue->block = make_mutex();
+    queue->flag = TURN_ON;
 #ifdef condition /*CONDITION VARIABLES*/
     queue->buffer_not_empty = make_cond();
     queue->buffer_not_full = make_cond();
@@ -25,14 +26,7 @@ pthread_t initConsumerQueue()
     queue->buffer_elements = make_semaphore(0);
     queue->buffer_capacity = make_semaphore(sizeConsumerQueue - 1);
 #endif
-
-    for (int i = 0; i < 5; i++)
-    {
-        makeConsumerProducerThread(consumerHandler, queue);
-    }
-    pthread_t consumerThread;
-    make_thread(&consumerThread, runConsumerQueue, queue);
-    return consumerThread;
+    return queue;
 }
 
 void *runConsumerQueue(Queue *queue)

@@ -33,28 +33,11 @@ void make_thread(pthread_t* thread, void *function, void *fifoBuffer);
 *  @param   'fifoBuffer'    The buffer to read from or write on.
 *  @param   'name'          Name of the Thread
 */
-pthread_t makeConsumerProducerThread(void *function, Queue *queue);
+//pthread_t makeConsumerProducerThread(void *function, Queue *queue);
 
 
 
-/* ============================================================================
-*  @brief   Set cancel state (enable) with error handling.
-*/
-void cancelEnable(void);
 
-
-
-/* ============================================================================
-*  @brief   Set cancel state (disable) with error handling.
-*/
-void cancelDisable(void);
-
-
-
-/* ============================================================================
-*  @brief   Function for allocating storage with error handling.
-*/
-void *check_malloc(int size);
 
 
 #endif /*_THREAD_H*/

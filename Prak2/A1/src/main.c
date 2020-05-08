@@ -49,7 +49,8 @@ int main(int argc, char const *argv[])
             int tc4 = pthread_cancel(controlThread);
             HANDLE_ERR(tc4);
             printf("Destroying Mutex.....\n");
-            pthread_mutex_destroy(fifoBuffer->bufferMutex);
+            int tc5 = pthread_mutex_destroy(fifoBuffer->bufferMutex);
+            HANDLE_ERR(tc5);
     
         #ifdef condition /*Conditional Variables*/
             // int cd1 = cond_destroy(fifoBuffer->buffer_empty);

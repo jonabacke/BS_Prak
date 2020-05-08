@@ -9,6 +9,8 @@
 
 #include "fifo.h"
 
+#define BUFFER_SIZE 	10
+
 FIFOBuffer *fifoBuffer;
 
 /* ============================================================================
@@ -44,7 +46,7 @@ FIFOBuffer *make_FIFOBuffer()
 *  @param   'fifoBuffer'  The buffer to work on
 *  @param   'letter'      The letter to be written in the buffer
 */
-void writeInFIFO(char letter)
+void writeInFIFO(void *letter)
 {
 
 #ifdef condition /*Conditional variables*/
@@ -57,7 +59,7 @@ void writeInFIFO(char letter)
 	cancelDisable();
 
     /*CRITICAL SECTION*/
-    fifoBuffer->bufferContent[fifoBuffer->writePointer] = letter;                           // write letter in buffer
+    fifoBuffer->bufferContent[fifoBuffer->writePointer] = *(char *)letter;                           // write letter in buffer
     fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer->writePointer);                // set writepointer
     fifoBuffer->bufferLevel ++;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
@@ -73,7 +75,7 @@ void writeInFIFO(char letter)
     mutex_lock(fifoBuffer->bufferMutex);
 
     /*CRITICAL SECTION*/
-    fifoBuffer->bufferContent[fifoBuffer->writePointer] = letter;                           // write letter in buffer
+    fifoBuffer->bufferContent[fifoBuffer->writePointer] = *(char *)letter;                        // write letter in buffer
     fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer->writePointer);    // set writepointer
     fifoBuffer->bufferLevel ++;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
@@ -93,7 +95,7 @@ void writeInFIFO(char letter)
 *  @param   'fifoBuffer'    The buffer to work on
 *  @return  'letter'        Returns the letter that has been read from the FIFO buffer.
 */
-void readFromFIFO(char *letter)
+void readFromFIFO(void *letter)
 {
     
 
@@ -106,7 +108,7 @@ void readFromFIFO(char *letter)
     }
     cancelDisable();
     /*CRITICAL SECTION*/
-    letter = fifoBuffer->bufferContent[fifoBuffer->readPointer];                        // read letter from buffer
+    letter = (char*) &(fifoBuffer->bufferContent[fifoBuffer->readPointer]);                        // read letter from buffer
     fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
@@ -122,7 +124,7 @@ void readFromFIFO(char *letter)
     mutex_lock(fifoBuffer->bufferMutex);
    
     /*CRITICAL SECTION*/
-    *letter = fifoBuffer->bufferContent[fifoBuffer->readPointer];                        // read letter from buffer
+    letter = (char*) &(fifoBuffer->bufferContent[fifoBuffer->readPointer]);                       // read letter from buffer
     fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
     printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
