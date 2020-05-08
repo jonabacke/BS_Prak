@@ -20,11 +20,12 @@
 void *consumerHandler(Queue *queue)
 {
     printf("consumerHandler entered\n");
+    char buffer;
+    struct TaskHeader *header = check_malloc(sizeof(struct TaskHeader));
     while (CONSUMER_THREAD_ACTIVE)
     {
-        char buffer;
-        readFromQueue(queue, &buffer);
-        (*queue->header->routineForTask)(&buffer);
+        readFromQueue(queue, &buffer, header);
+        (*(header->routineForTask))(&buffer);
         sleep(TWO_SECONDS);
     }
     pthread_exit(NULL);
@@ -39,8 +40,6 @@ void *consumerHandler(Queue *queue)
 */
 void consumer(char *letter)
 {
-    printf("consumer active\n");
-
     readFromFIFO(letter);
 
     printf("Consumer nimmt %c aus Puffer \n", *letter);

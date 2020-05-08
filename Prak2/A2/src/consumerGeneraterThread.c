@@ -12,12 +12,12 @@ Queue *initConsumerQueue()
     queue->length = sizeConsumerQueue;
     queue->queue = consumerQueue;
     queue->bufferMutex = make_mutex();
+    queue->block = make_mutex();
     queue->header = check_malloc(sizeof(struct TaskHeader));
-    queue->header->routineForTask = readFromFIFO;
-    queue->header->argSize = sizeof(FIFOBuffer);
+    queue->header->routineForTask = &readFromFIFO;
+    queue->header->argSize = sizeof(char);
     queue->readPointer = 0;
     queue->writePointer = 0;
-    queue->block = make_mutex();
     queue->flag = TURN_ON;
 #ifdef condition /*CONDITION VARIABLES*/
     queue->buffer_not_empty = make_cond();
@@ -31,17 +31,17 @@ Queue *initConsumerQueue()
 
 void *runConsumerQueue(Queue *queue)
 {
+	struct TaskHeader header;
+	header.argSize = sizeof(char);
+	header.routineForTask = readFromFIFO;
 
     while (1)
     {
-        char result = '_';
-        printf("hi7 \n");
+        char result;
         mutex_lock(queue->block);
-        pthread_cleanup_push(cleanup_handler, queue->block);
-        writeIntoQueue(queue, &result);
-        pthread_cleanup_pop(1);
         mutex_unlock(queue->block);
-        printf("result: %c\n", result);
+        printf("schreibeConsumerTask in Queue\n");
+        writeIntoQueue(queue, &result, header);
         sleep(TWO_SECONDS);
     }
 

@@ -9,10 +9,9 @@
 
 
 #include "controler.h"
-#include "general.h"
 
-#define AMOUNTPRODUCER 	5
-#define AMOUNTCONSUMER	5
+#define AMOUNTPRODUCER 	1
+#define AMOUNTCONSUMER	1
 
 Queue *producerQueue;
 Queue *consumerQueue;
@@ -20,8 +19,8 @@ Queue *consumerQueue;
 pthread_t producerGenerator;
 pthread_t consumerGenerator;
 
-pthread_t producerThread[AMOUNTPRODUCER];
-pthread_t consumerThread[AMOUNTCONSUMER];
+pthread_t *producerThread;
+pthread_t *consumerThread;
 
 /* ============================================================================
 *  @brief   Function used by the control thread. Reads key input, can pause 
@@ -34,6 +33,9 @@ void *control(void *not_used)
 
 	make_thread(&producerGenerator, runProducerQueue, producerQueue);
 	make_thread(&consumerGenerator, runConsumerQueue, consumerQueue);
+
+	producerThread = check_malloc(sizeof(pthread_t) * AMOUNTPRODUCER);
+	consumerThread = check_malloc(sizeof(pthread_t) * AMOUNTCONSUMER);
 
 	for (int i = 0; i < AMOUNTPRODUCER; ++ i) {
 		make_thread(&producerThread[i], producerHandler, producerQueue);

@@ -3,6 +3,7 @@
 
 
 #include <ctype.h> //tolower
+#include <pthread.h>
 #include "mutex.h"
 #include "consumerGeneraterThread.h"
 #include "producerGeneraterThread.h"

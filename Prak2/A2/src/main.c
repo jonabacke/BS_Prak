@@ -30,9 +30,6 @@ void cond_destroy(Cond *cond)
 */
 int main(int argc, char const *argv[])
 {
-    printf("ADS\n");
-    sleep(1);
-    // FIFOBuffer *fifoBuffer = 
     make_FIFOBuffer();
     make_thread(&threadControl, control, NULL);
 

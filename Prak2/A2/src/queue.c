@@ -11,7 +11,7 @@
 
 
 
-void readFromQueue(Queue *queue, char *argBuf)
+void readFromQueue(Queue *queue, char *argBuf, struct TaskHeader *header)
 {
 #ifdef condition /*Conditional Variables*/
     mutex_lock(queue->bufferMutex);
@@ -36,7 +36,7 @@ void readFromQueue(Queue *queue, char *argBuf)
     mutex_lock(queue->bufferMutex);
    
     /*CRITICAL SECTION*/
-    receiveFromTaskQueue(queue->queue, queue->header, argBuf, sizeof(char));
+    receiveFromTaskQueue(queue->queue, header, argBuf, sizeof(char));
     queue->readPointer = queuePointer_incr(queue->readPointer);
 
     mutex_unlock(queue->bufferMutex);
@@ -50,7 +50,7 @@ void readFromQueue(Queue *queue, char *argBuf)
 
 
 
-void writeIntoQueue(Queue *queue, const char *arg)
+void writeIntoQueue(Queue *queue, const char *arg, struct TaskHeader header)
 {
 #ifdef condition /*Conditional variables*/
     mutex_lock(queue->bufferMutex);
@@ -76,7 +76,7 @@ void writeIntoQueue(Queue *queue, const char *arg)
     mutex_lock(queue->bufferMutex);
 
     /*CRITICAL SECTION*/
-    sendToTaskQueue(queue->queue, *(queue->header), arg, 0);
+    sendToTaskQueue(queue->queue, header, arg, 0);
     queue->writePointer = queuePointer_incr(queue->writePointer);
 
     mutex_unlock(queue->bufferMutex);

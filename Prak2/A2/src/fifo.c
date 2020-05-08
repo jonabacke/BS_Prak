@@ -62,7 +62,6 @@ void writeInFIFO(void *letter)
     fifoBuffer->bufferContent[fifoBuffer->writePointer] = *(char *)letter;                           // write letter in buffer
     fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer->writePointer);                // set writepointer
     fifoBuffer->bufferLevel ++;
-    printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
     mutex_unlock(fifoBuffer->bufferMutex);
     pthread_cleanup_pop(1);
@@ -78,7 +77,6 @@ void writeInFIFO(void *letter)
     fifoBuffer->bufferContent[fifoBuffer->writePointer] = *(char *)letter;                        // write letter in buffer
     fifoBuffer->writePointer = bufferPointer_incr(fifoBuffer->writePointer);    // set writepointer
     fifoBuffer->bufferLevel ++;
-    printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
     mutex_unlock(fifoBuffer->bufferMutex);
     cancelEnable();
@@ -111,7 +109,6 @@ void readFromFIFO(void *letter)
     letter = (char*) &(fifoBuffer->bufferContent[fifoBuffer->readPointer]);                        // read letter from buffer
     fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
-    printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
     mutex_unlock(fifoBuffer->bufferMutex);
     cancelEnable();
@@ -127,7 +124,6 @@ void readFromFIFO(void *letter)
     letter = (char*) &(fifoBuffer->bufferContent[fifoBuffer->readPointer]);                       // read letter from buffer
     fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
-    printf("BufferLevel = %d\n", fifoBuffer->bufferLevel);
 
     mutex_unlock(fifoBuffer->bufferMutex);
     cancelEnable();
