@@ -9,6 +9,6 @@
 #include "getcharTimeout.h"
 #include "thread.h"
 
-Queue *initProducerQueue(void);
+Queue *initProducerQueue(char *name);
 void *runProducerQueue(Queue *queue);
 

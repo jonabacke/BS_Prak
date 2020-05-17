@@ -4,11 +4,12 @@
 
 #define sizeProducerQueue 10
 #define POOLSIZE 5
+#define ALPHALENGTH 25
 
-Queue *initProducerQueue(void)
+Queue *initProducerQueue(char *name)
 {
     printf("generateProducerQueue\n");
-    mqd_t producerQueue = createTaskQueue("/producer", sizeProducerQueue, sizeof(char));
+    mqd_t producerQueue = createTaskQueue(name, sizeProducerQueue, sizeof(char));
 
     Queue *queue = check_malloc(sizeof(Queue));
     queue->length = sizeProducerQueue;
@@ -38,14 +39,23 @@ void *runProducerQueue(Queue *queue)
 	header.argSize = sizeof(char);
 	header.routineForTask = writeInFIFO;
 
+	int pointer = 0;
+	char *alpha = "qwertzuioplkjhgfdayxcvbnm";
+	char arg;
+
     while (1)
     {
-    	char arg = 'a';//(char)getcharTimeout(1);
+    	arg = alpha[pointer];
+    	pointer ++;
+    	pointer = pointer % ALPHALENGTH;
+
+
         mutex_lock(queue->block);
         mutex_unlock(queue->block);
         printf("schreibe producerTask in Queue\n");
         writeIntoQueue(queue, &arg, header);
-        printf("%c soll in den Stack gelegt werden\n", arg);
+        printf("%c soll in den FIFO gelegt werden\n", arg);
+        sleep(ONE_SECOND);
     }
     pthread_exit(NULL);
 }

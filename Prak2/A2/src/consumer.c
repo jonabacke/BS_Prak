@@ -21,11 +21,13 @@ void *consumerHandler(Queue *queue)
 {
     printf("consumerHandler entered\n");
     char buffer;
-    struct TaskHeader *header = check_malloc(sizeof(struct TaskHeader));
+//    struct TaskHeader *header = check_malloc(sizeof(struct TaskHeader));
     while (CONSUMER_THREAD_ACTIVE)
     {
-        readFromQueue(queue, &buffer, header);
-        (*(header->routineForTask))(&buffer);
+    	struct TaskHeader header2;
+        readFromQueue(queue, &buffer, &header2);
+        (*(header2.routineForTask))(&buffer);
+        printf("%c wurde aus dem FIFO geholt\n", buffer);
         sleep(TWO_SECONDS);
     }
     pthread_exit(NULL);

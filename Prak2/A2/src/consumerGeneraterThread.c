@@ -3,10 +3,10 @@
 #include <unistd.h>
 #include "consumer.h"
 
-Queue *initConsumerQueue()
+Queue *initConsumerQueue(char *consumerQueueName)
 {
     printf("generateConsumerQueue\n");
-    mqd_t consumerQueue = createTaskQueue("/consumer", sizeConsumerQueue, sizeof(char));
+    mqd_t consumerQueue = createTaskQueue(consumerQueueName, sizeConsumerQueue, sizeof(char));
 
     Queue *queue = check_malloc(sizeof(Queue));
     queue->length = sizeConsumerQueue;

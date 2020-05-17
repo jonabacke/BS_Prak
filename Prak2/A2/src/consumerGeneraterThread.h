@@ -13,6 +13,6 @@
 #define sizeConsumerQueue 10
 
 
-Queue *initConsumerQueue(void);
+Queue *initConsumerQueue(char *consumerQueueName);
 
 void *runConsumerQueue(Queue *queue);

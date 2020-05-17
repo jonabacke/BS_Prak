@@ -38,8 +38,8 @@ void printCommands();
 /* ============================================================================
 *  @brief   Terminates the producer and consumer threads.
 */
-void cancelAll();
+void cancelAll(char *producerQueueName, char *consumerQueueName);
 
-void deleteAll();
+void deleteAll(char *producerQueueName, char *consumerQueueName);
 
 #endif /*_CONTROLER_H*/

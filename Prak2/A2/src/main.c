@@ -37,6 +37,31 @@ int main(int argc, char const *argv[])
 
 
 
+//	Queue *queue = initProducerQueue();
+
+//    mqd_t producerQueue = createTaskQueue("/producer", 10, sizeof(char));
+
+//	struct TaskHeader header;
+//	header.argSize = sizeof(char);
+//	header.routineForTask = writeInFIFO;
+//	char peter = 'a';
+//
+//	sendToTaskQueue(producerQueue, header, &peter, 1);
+//
+//	printf("rein geschrieben \n");
+//
+//
+//	struct TaskHeader header2;
+//	char hans;
+//	receiveFromTaskQueue(producerQueue, &header2, &hans, sizeof(char));
+//
+//	printf("raus gelesen\n");
+//
+//	destroyTaskQueue("/producer");
+//
+//	closeTaskQueue(producerQueue);
+//
+//
 
 
 

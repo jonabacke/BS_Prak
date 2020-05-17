@@ -24,6 +24,7 @@
 #define BUFFER_SIZE                 10
 #define THREE_SECONDS               3
 #define TWO_SECONDS                 2
+#define ONE_SECOND	                1
 #define TURN_ON				        1
 #define TURN_OFF			        0
 #define SYSTEM_ACTIVE               1

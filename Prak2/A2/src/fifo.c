@@ -96,7 +96,7 @@ void writeInFIFO(void *letter)
 void readFromFIFO(void *letter)
 {
     
-
+	char* l = letter;
 #ifdef condition /*Conditional Variables*/
     mutex_lock(fifoBuffer->bufferMutex);
     pthread_cleanup_push(cleanup_handler, fifoBuffer->bufferMutex);
@@ -106,7 +106,7 @@ void readFromFIFO(void *letter)
     }
     cancelDisable();
     /*CRITICAL SECTION*/
-    letter = (char*) &(fifoBuffer->bufferContent[fifoBuffer->readPointer]);                        // read letter from buffer
+    *l = (char) (fifoBuffer->bufferContent[fifoBuffer->readPointer]);                        // read letter from buffer
     fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
 
@@ -121,7 +121,7 @@ void readFromFIFO(void *letter)
     mutex_lock(fifoBuffer->bufferMutex);
    
     /*CRITICAL SECTION*/
-    letter = (char*) &(fifoBuffer->bufferContent[fifoBuffer->readPointer]);                       // read letter from buffer
+    *l = (char) (fifoBuffer->bufferContent[fifoBuffer->readPointer]);                       // read letter from buffer
     fifoBuffer->readPointer = bufferPointer_incr(fifoBuffer->readPointer);              // set readpointer
     fifoBuffer->bufferLevel--;
 

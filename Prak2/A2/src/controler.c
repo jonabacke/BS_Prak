@@ -10,8 +10,8 @@
 
 #include "controler.h"
 
-#define AMOUNTPRODUCER 	1
-#define AMOUNTCONSUMER	1
+#define AMOUNTPRODUCER 	5
+#define AMOUNTCONSUMER	5
 
 Queue *producerQueue;
 Queue *consumerQueue;
@@ -28,8 +28,11 @@ pthread_t *consumerThread;
 */
 void *control(void *not_used)
 {
-	producerQueue = initProducerQueue();
-	consumerQueue = initConsumerQueue();
+	char *producerQueueName = "/producer";
+	char *consumerQueueName = "/consumer";
+
+	producerQueue = initProducerQueue(producerQueueName);
+	consumerQueue = initConsumerQueue(consumerQueueName);
 
 	make_thread(&producerGenerator, runProducerQueue, producerQueue);
 	make_thread(&consumerGenerator, runConsumerQueue, consumerQueue);
@@ -55,7 +58,7 @@ void *control(void *not_used)
         {
         case 'p':
             toggleThread(producerQueue);
-            printf("--- toggle Producer_1\n");
+            printf("--- toggle Producer\n");
             break;
 
         case 'c':
@@ -65,7 +68,7 @@ void *control(void *not_used)
 
         case 'q':
             printf("--- Programm wird beendet.\n");
-            cancelAll();
+            cancelAll(producerQueueName, consumerQueueName);
             break;
 
         case 'h':
@@ -120,17 +123,9 @@ void printCommands()
 /* ============================================================================
 *  @brief   Terminates the producer and consumer threads.
 */
-void cancelAll() 
+void cancelAll(char *producerQueueName, char *consumerQueueName)
 {
 	printf("cancelAll wird betreten \n");
-    if (producerQueue->flag == TURN_OFF)
-    {
-        toggleThread(producerQueue);
-    }
-    if (consumerQueue->flag == TURN_OFF)
-    {
-        toggleThread(consumerQueue);
-    }
     int tc1 = pthread_cancel(producerGenerator);
     HANDLE_ERR(tc1);
     int tc2 = pthread_cancel(consumerGenerator);
@@ -145,15 +140,31 @@ void cancelAll()
 		int tc4 = pthread_cancel(consumerThread[i]);
 	    HANDLE_ERR(tc4);
 	}
+    if (producerQueue->flag == TURN_OFF)
+    {
+        toggleThread(producerQueue);
+    }
+    if (consumerQueue->flag == TURN_OFF)
+    {
+        toggleThread(consumerQueue);
+    }
 
-    deleteAll();
+    deleteAll(producerQueueName, consumerQueueName);
     pthread_exit(NULL);
 }
 
 
-void deleteAll()
+void deleteAll(char *producerQueueName, char *consumerQueueName)
 {
 	// delete all mellocs,mutex sem...
+
+	destroyTaskQueue(producerQueueName);
+
+	closeTaskQueue(producerQueue->queue);
+
+	destroyTaskQueue(consumerQueueName);
+
+	closeTaskQueue(consumerQueue->queue);
 }
 
 
