@@ -232,6 +232,11 @@ void allocate_page(const int req_page, const int g_count) {
     le.g_count = g_count; 
     le.pf_count = pf_count;
     logger(le);
+    //TODO:
+    /*
+    - update page table
+    - log page fault
+    */
 }
 
 void fetchPage(int page, int frame){
@@ -246,6 +251,7 @@ void fetchPage(int page, int frame){
 
 void removePage(int page) {
     //TODO:
+    //removedPage = page;
 }
 
 void find_remove_fifo(int page, int * removedPage, int *frame){

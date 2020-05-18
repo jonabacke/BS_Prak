@@ -75,7 +75,17 @@ static void vmem_put_page_into_mem(int address) {
 int vmem_read(int address) {
     //TODO:
     /*
-    - read und write berechnen aus der virtuellen Speicheradresse die Framenummer und den Offset
+    - read und write berechnen aus der virtuellen Speicheradresse die Framenummer und den Offset:
+
+    int seitenNummer = (address & 0x1000) >> 3;
+    int offset = address & 0x0111;
+    
+    if (pt->frame == VOID_IDX) Seitenfehler; // no frame reference in page table
+    else {
+        int pageFrameNummer = pt[seitenNummer]->frame;
+    }
+
+    
     - wenn die benötigte Seite nicht geladen ist 
             -> vmem_put_page_into_mem(address); (pagefile -> mainMemory)
     */
