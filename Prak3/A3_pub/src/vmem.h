@@ -5,7 +5,7 @@
 
  * First Version : Wolfgang Fohl HAW Hamburg
  * Dec 2015 : Delete BitMap for free frames (Franz Korf, HAW Hamburg)
- * Dec 2015 : Set memory algorithm vi command line parameter 
+ * Dec 2015 : Set memory algorithm via command line parameter 
  * Dec 2015 : Set define for PAGESIZE and VMEM_ALGO via compiler -D option (Franz Korf, HAW Hamburg)
  * Dec 2015 : Add some documentation (Franz Korf, HAW Hamburg)
  * April 2018 : New IPC for mmanage and vmappl (Franz Korf, HAW Hamburg)
@@ -21,7 +21,7 @@
 
 
 /**
- * Constant VMEM_PAGESIZE will be sete via compiler -D option. 
+ * Constant VMEM_PAGESIZE will be set via compiler -D option. 
  * Default value : 8
  * value range : 8 16 32 64 
  */
@@ -33,8 +33,8 @@
 /* Sizes */
 #define VMEM_VIRTMEMSIZE 1024   				//!< Size of virtual address space of the process
 #define VMEM_PHYSMEMSIZE  128   				//!< Size of physical memory
-#define VMEM_NPAGES     (VMEM_VIRTMEMSIZE / VMEM_PAGESIZE)	//!< Total number of pages 
-#define VMEM_NFRAMES (VMEM_PHYSMEMSIZE / VMEM_PAGESIZE)		//!< Total number of (page) frames 
+#define VMEM_NPAGES     (VMEM_VIRTMEMSIZE / VMEM_PAGESIZE)	//!< Total number of pages                 //(1024 Byte/ 8 Byte = 128 Pages)
+#define VMEM_NFRAMES (VMEM_PHYSMEMSIZE / VMEM_PAGESIZE)		//!< Total number of (page) frames/        //(128 Byte/ 8 Byte = 16 Pageframes) 
 
 
 /**
@@ -60,8 +60,8 @@ struct pt_entry {
  * The data structure stored in shared memory
  */
 struct vmem_struct {
-    struct pt_entry pt[VMEM_NPAGES];               //!< page table 
-    int mainMemory[VMEM_NFRAMES * VMEM_PAGESIZE];  //!< main memory used by virtual memory simulation 
+    struct pt_entry pt[VMEM_NPAGES];               //!< page table                                     //Seitentabelle (128 Eintraege)
+    int mainMemory[VMEM_NFRAMES * VMEM_PAGESIZE];  //!< main memory used by virtual memory simulation  //(16 Pageframes * 8 Byte = 128 Byte (PhysMemSize/repräs. Hauptspeicher))
 };
 
 

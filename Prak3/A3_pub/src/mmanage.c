@@ -197,9 +197,14 @@ void dump_pt(void) {
 /* Your code goes here... */
 
 void cleanup(void) {
+    //TODO:
+    /*
+    - im Signalhandler zu SIGINT einhängen
+    */
 }
 
 void vmem_init(void) {
+    //TODO:
 
     /* Create System V shared memory */
 
@@ -212,6 +217,10 @@ void vmem_init(void) {
 }
 
 int find_unused_frame() {
+    //TODO:
+    /*
+    - freien Seitenrahmen suchen
+    */
 }
 
 void allocate_page(const int req_page, const int g_count) {
@@ -226,40 +235,61 @@ void allocate_page(const int req_page, const int g_count) {
 }
 
 void fetchPage(int page, int frame){
+    //TODO:
+    /*
+    Prozess <mmanage> nimmt eine Seite aus Datei <pagefile>
+    -> lagert diese in einen Seitenrahmen von mainMemory ein
+    -> Wenn dabei eine Seite aus einem Seitenrahmen verdrängt wird, schreibt <mmanage> 
+        die modifizierte Seite an die richtige Stelle in der Datei <pagefile> zurück
+    */
 }
 
 void removePage(int page) {
+    //TODO:
 }
 
 void find_remove_fifo(int page, int * removedPage, int *frame){
-}
-
-static void find_remove_aging(int page, int * removedPage, int *frame){
-}
-
-static void update_age_reset_ref(void) {
-} 
-
-static void find_remove_clock(int page, int * removedPage, int *frame){
-}
-
-// EOF
-
-
-/*
-
-FIFO
-- Seiten stehen als verkettete Liste im Speicher
-- Bei Seitenfehler:
+    //TODO:
+    /*
+    -bei Seitenfehler: 
+            logger();
+    FIFO
+    - Seiten stehen als verkettete Liste im Speicher
+    - Bei Seitenfehler:
         - Element/Seite mit ältestem Ladezeitpunkt (Listenkopf) wird entfernt
         - Neues Element am Ende der Liste einfügen
         -> R-Bit wird nicht benötigt
         -> keine Unterscheidung zwischen viel und wenig genutzten Seiten
             (älteste Seite wird ausgelagert)
+    */
+}
 
+static void find_remove_aging(int page, int * removedPage, int *frame){
+    //TODO:
+    /*
+    -bei Seitenfehler: 
+            logger();
+    AGING:
+    - Jede Seite hat einen SW-Zähler, der mit 0 initialisiert ist.
+    - zyklisch (alle 20 ms):
+        - Zähler um 1 nach rechts shiften (/2)
+        - R-Bit auf MSB (links)
+        - R-Bit zurücksetzen
+        - bei 8-Bit Breite von Age: age beim Einlagern der Seite auf 0x80 setzen
+    */
+}
 
-CLOCK
-- 2cFIFO, aber zyklische Liste:
+static void update_age_reset_ref(void) {
+    //TODO:
+} 
+
+static void find_remove_clock(int page, int * removedPage, int *frame){
+    //TODO:
+    /*
+    -bei Seitenfehler: 
+            logger();
+    CLOCK
+    - 2cFIFO, aber zyklische Liste:
         ->  Pointer auf Kopfelement
 
             checkElement(pointer) {
@@ -274,13 +304,15 @@ CLOCK
                     checkElement(pointer);
                 }
             }
+    */
+}
+
+// EOF
 
 
-AGING:
-- Jede Seite hat einen SW-Zähler, der mit 0 initialisiert ist.
-- zyklisch (alle 20 ms):
-        - Zähler um 1 nach rechts shiften (/2)
-        - R-Bit auf MSB (links)
-        - R-Bit zurücksetzen
-        - bei 8-Bit Breite von Age: age beim Einlagern der Seite auf 0x80 setzen
+/*
+- Virtueller Speicher wird in pagefile nachgebildet
+- Größe des virtuellen Speichers: VMEM_VIRTMEMSIZE Byte
+    -> in Seiten der Größe VMEM_PAGESIZE Byte unterteilt
+    -> werden in der Datei <pagefile> hintereinander abgelegt
 */
