@@ -77,7 +77,6 @@ typedef struct  /*Queue*/
     int32_t length;
     Mutex *bufferMutex;
     mqd_t queue;
-    struct TaskHeader *header;
     Mutex *block;
     int flag;
 #ifdef condition /*CONDITION VARIABLES*/

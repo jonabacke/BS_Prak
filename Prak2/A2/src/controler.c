@@ -165,6 +165,79 @@ void deleteAll(char *producerQueueName, char *consumerQueueName)
 	destroyTaskQueue(consumerQueueName);
 
 	closeTaskQueue(consumerQueue->queue);
+
+
+
+//     ENDING THE PROGRAM
+
+     printf("Destroying Mutex.....\n");
+
+
+
+     int f = pthread_mutex_destroy(producerQueue->bufferMutex);
+     HANDLE_ERR(f);
+     f = pthread_mutex_destroy(producerQueue->block);
+     HANDLE_ERR(f);
+     f = pthread_mutex_destroy(consumerQueue->bufferMutex);
+     HANDLE_ERR(f);
+     f = pthread_mutex_destroy(consumerQueue->block);
+     HANDLE_ERR(f);
+
+#ifdef condition /*Conditional Variables*/
+     f = cond_destroy(producerQueue->buffer_not_empty);
+     HANDLE_ERR(f);
+     int f = cond_destroy(producerQueue->buffer_not_full);
+     HANDLE_ERR(f);
+#else /*Semaphores*/
+    printf("Destroying Semaphores.....\n");
+     f = sem_destroy(producerQueue->buffer_elements);
+    HANDLE_ERR(f);
+     f = sem_destroy(producerQueue->buffer_capacity);
+    HANDLE_ERR(f);
+#endif
+
+    printf("Freeing memory.....\n");
+#ifdef condition /*Conditional Variables*/
+    free(producerQueue->buffer_not_empty);
+    free(producerQueue->buffer_not_full);
+#else /*Semaphores*/
+    free(producerQueue->buffer_elements);
+    free(producerQueue->buffer_capacity);
+#endif
+
+
+
+#ifdef condition /*Conditional Variables*/
+     f = cond_destroy(consumerQueue->buffer_not_empty);
+     HANDLE_ERR(f);
+     f = cond_destroy(consumerQueue->buffer_not_full);
+     HANDLE_ERR(f);
+#else /*Semaphores*/
+    printf("Destroying Semaphores.....\n");
+     f = sem_destroy(consumerQueue->buffer_elements);
+    HANDLE_ERR(f);
+     f = sem_destroy(consumerQueue->buffer_capacity);
+    HANDLE_ERR(f);
+#endif
+
+    printf("Freeing memory.....\n");
+#ifdef condition /*Conditional Variables*/
+    free(consumerQueue->buffer_not_empty);
+    free(consumerQueue->buffer_not_full);
+#else /*Semaphores*/
+    free(consumerQueue->buffer_elements);
+    free(consumerQueue->buffer_capacity);
+#endif
+
+    free(producerQueue->bufferMutex);
+    free(producerQueue->block);
+    free(producerQueue);
+
+    free(consumerQueue->bufferMutex);
+    free(consumerQueue->block);
+    free(consumerQueue);
+
+     printf("................ end of destroy process.\n");
 }
 
 

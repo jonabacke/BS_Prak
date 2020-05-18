@@ -13,9 +13,6 @@ Queue *initConsumerQueue(char *consumerQueueName)
     queue->queue = consumerQueue;
     queue->bufferMutex = make_mutex();
     queue->block = make_mutex();
-    queue->header = check_malloc(sizeof(struct TaskHeader));
-    queue->header->routineForTask = &readFromFIFO;
-    queue->header->argSize = sizeof(char);
     queue->readPointer = 0;
     queue->writePointer = 0;
     queue->flag = TURN_ON;
@@ -42,7 +39,7 @@ void *runConsumerQueue(Queue *queue)
         mutex_unlock(queue->block);
         printf("schreibeConsumerTask in Queue\n");
         writeIntoQueue(queue, &result, header);
-        sleep(TWO_SECONDS);
+        sleep(ONE_SECOND);
     }
 
     pthread_exit(NULL);

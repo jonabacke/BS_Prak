@@ -16,9 +16,6 @@ Queue *initProducerQueue(char *name)
     queue->queue = producerQueue;
     queue->bufferMutex = make_mutex();
     queue->block = make_mutex();
-    queue->header = check_malloc(sizeof(struct TaskHeader));
-    queue->header->routineForTask = &writeInFIFO;
-    queue->header->argSize = sizeof(char);
     queue->readPointer = 0;
     queue->writePointer = 0;
     queue->flag = TURN_ON;
