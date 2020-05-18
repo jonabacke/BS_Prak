@@ -5,12 +5,15 @@
  * @brief This header file defines some macros for debug output.
  */
 
-#ifndef DEBUG_H 
-#define DEBUG_H
+
+#ifndef _DEBUG_H 
+#define _DEBUG_H
+
 
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+
 
 #ifdef DEBUG_MESSAGES
 /**
@@ -33,6 +36,7 @@
         exit(EXIT_FAILURE); \
 }
 
+
 /**
  * Based on a condition this macro prints an error message to stderr and exits.
  */
@@ -41,5 +45,6 @@
         exit(EXIT_FAILURE); \
 }
 
-#endif /* DEBUG_H */
+
+#endif /* _DEBUG_H */
 

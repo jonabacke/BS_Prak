@@ -22,9 +22,13 @@
  ******************************************************************
  */
 
+
 #ifndef _SYNCDATAEXCHANGE_H
 #define _SYNCDATAEXCHANGE_H
+
+
 #include <stdbool.h>
+
 
 /*
  * @brief Datenstruktur zur Beschreibung eines Auftrags / einer Message
@@ -41,24 +45,41 @@ struct msg {
    int ref;
 };
 
+
+
 #define CMD_PAGEFAULT		1	// value gibt die einzulagernde Page mit
 #define CMD_TIME_INTER_VAL   	2	// Ein Time Interval ist abgelaufen
 #define CMD_ACK 		3	// value hat keine Bedeutung
 
+
+
 /**
- * @brief  Diese Funktion erzeugt die Ressourcen, die zum synchronnen Austausch
+ * @brief  Diese Funktion erzeugt die Ressourcen, die zum synchronen Austausch
+ *         der Daten benötigt werden.
+ * @param  isServer Ist dieses Flag true, so wird die Kommunkation für den Server 
+ *                  aufgesetzt. Ansonsten für den Client.
+ */
+static void setupSyncDataExchangeInternal(bool isServer); 
+
+
+
+/**
+ * @brief  Diese Funktion erzeugt die Ressourcen, die zum synchronen Austausch
  *         der Daten benötigt werden, von Seiten des Servers.
  *         Da die Daten vor der ersten Kommunikation vorliegen müssen, wird die
  *         Funktion von Server aufgerufen.
  */
 extern void setupSyncDataExchange(void);
 
+
+
 /**
- * @brief   Diese Funktion gibt die Ressourcen, die zum synchronnen Austausch
- *          der Daten benötigt werdeni, wieder frei.
+ * @brief   Diese Funktion gibt die Ressourcen, die zum synchronen Austausch
+ *          der Daten benötigt werden, wieder frei.
  *          Diese Funktion wird vom Server aufgerufen.
  */
 extern void destroySyncDataExchange(void);
+
 
 
 /**
@@ -70,6 +91,8 @@ extern void destroySyncDataExchange(void);
  ****************************************************************************************/
 extern void sendMsgToMmanager(struct msg msg);
 
+
+
 /**
  *****************************************************************************************
  *  @brief      This function blocks until a message from vmapp has arrived.
@@ -77,6 +100,8 @@ extern void sendMsgToMmanager(struct msg msg);
  *  @return     Message that has been received 
  ****************************************************************************************/
 extern struct msg waitForMsg(void);
+
+
 
 /**
  *****************************************************************************************
@@ -86,5 +111,6 @@ extern struct msg waitForMsg(void);
  ****************************************************************************************/
 extern void sendAck(void);
 
-#endif
-//EOF
+
+#endif /*_SYNCDATAEXCHANGE_H*/
+

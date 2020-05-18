@@ -7,10 +7,14 @@
  *        implementation of Wolfgang Fohl.
  */
 
+
 #include "logger.h"
 #include "debug.h"
 
+
 static FILE *logfile = NULL;  //!< Reference to logfile
+
+
 
 void open_logger(void) {
     /* Open logfile */
@@ -18,9 +22,13 @@ void open_logger(void) {
     TEST_AND_EXIT_ERRNO(!logfile, "Error creating logfile");
 }
 
+
+
 void close_logger(void) {
     fclose(logfile);
 }
+
+
 
 /* Do not change!  */
 void logger(struct logevent le) {
@@ -30,5 +38,6 @@ void logger(struct logevent le) {
             le.replaced_page, le.req_pageno, le.alloc_frame);
     fflush(logfile);
 }
+
 
 // EOF

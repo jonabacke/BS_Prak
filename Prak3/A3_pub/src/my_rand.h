@@ -16,17 +16,25 @@
   *
   */
 
+
+#ifndef _MY_RAND_H
+#define _MY_RAND_H
+
+
 #include <stdint.h>
+
 
 /**
   * @brief Same interface like srand 
   */
 extern void my_srand(int32_t seed);
 
+
+
 /**
   * @brief Same interface like rand 
   */
 extern int32_t my_rand(void);
 
-// EOF
 
+#endif /*_MY_RAND_H*/

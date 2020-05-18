@@ -5,8 +5,10 @@
  * @brief Header file of module for input / output of memory file.
  */
 
-#ifndef PAGEFILE_H
-#define PAGEFILE_H
+
+#ifndef _PAGEFILE_H
+#define _PAGEFILE_H
+
 
 /**
  *****************************************************************************************
@@ -15,6 +17,8 @@
  *  @return     void 
  ****************************************************************************************/
 void init_pagefile(void);
+
+
 
 /**
  *****************************************************************************************
@@ -29,6 +33,8 @@ void init_pagefile(void);
  ****************************************************************************************/
 void fetch_page_from_pagefile(int pageNo, int *frame_start);
 
+
+
 /**
  *****************************************************************************************
  *  @brief      This function writes a page to pagefile.
@@ -41,6 +47,8 @@ void fetch_page_from_pagefile(int pageNo, int *frame_start);
  ****************************************************************************************/
 void store_page_to_pagefile(int pageNo, int *frame_start);
 
+
+
 /**
  *****************************************************************************************
  *  @brief      This function cleans and closes page file module.
@@ -49,4 +57,6 @@ void store_page_to_pagefile(int pageNo, int *frame_start);
  ****************************************************************************************/
 void cleanup_pagefile(void);
 
-#endif
+
+#endif /*_PAGEFILE_H*/
+

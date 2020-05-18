@@ -9,6 +9,7 @@
   *
   */
 
+
 #include <errno.h>
 #include <limits.h>
 #include "debug.h"
@@ -16,10 +17,14 @@
 #include "my_rand.h"
 #include "pagefile.h"
 
+
 #define MMANAGE_PFNAME "./pagefile.bin" //!< Pagefile name 
 #define SEED_PF        070514           //!< Get reproducable pseudo-random numbers to init pagefile
 
+
 static FILE *pagefile = NULL;           //!< Reference to pagefile
+
+
 
 void init_pagefile(void) {
     int i;
@@ -36,6 +41,8 @@ void init_pagefile(void) {
     }
 }
 
+
+
 void fetch_page_from_pagefile(int pageNo, int *frame_start) {
     // check page number pt_itx
     TEST_AND_EXIT(pageNo <  0,           (stderr, "find_page: pageNo out of range\n"));
@@ -46,6 +53,8 @@ void fetch_page_from_pagefile(int pageNo, int *frame_start) {
     TEST_AND_EXIT_ERRNO(fseek(pagefile, offset, SEEK_SET) == -1, "Positioning in pagefile failed!");
     TEST_AND_EXIT_ERRNO(fread(frame_start, sizeof(int), VMEM_PAGESIZE, pagefile) != VMEM_PAGESIZE, "Error reading page from disk");
 }
+
+
 
 void store_page_to_pagefile(int pageNo, int *frame_start) {
     // check page number pt_itx
@@ -60,8 +69,10 @@ void store_page_to_pagefile(int pageNo, int *frame_start) {
 }
 
 
+
 void cleanup_pagefile(void) {
     TEST_AND_EXIT_ERRNO(fclose(pagefile) == -1, "fclose in cleanup_pagefile failed! ")
 }
+
 
 // EOF

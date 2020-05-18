@@ -11,11 +11,14 @@
  * April 2018 : New IPC for mmanage and vmappl (Franz Korf, HAW Hamburg)
  */
 
-#ifndef VMEM_H
-#define VMEM_H
+
+#ifndef _VMEM_H
+#define _VMEM_H
+
 
 #define SHMKEY          "./src/vmem.h" //!< First paremater for shared memory generation via ftok function
 #define SHMPROCID       1234           //!< Second paremater for shared memory generation via ftok function
+
 
 /**
  * Constant VMEM_PAGESIZE will be sete via compiler -D option. 
@@ -26,11 +29,13 @@
 #define VMEM_PAGESIZE 8
 #endif
 
+
 /* Sizes */
 #define VMEM_VIRTMEMSIZE 1024   				//!< Size of virtual address space of the process
 #define VMEM_PHYSMEMSIZE  128   				//!< Size of physical memory
 #define VMEM_NPAGES     (VMEM_VIRTMEMSIZE / VMEM_PAGESIZE)	//!< Total number of pages 
 #define VMEM_NFRAMES (VMEM_PHYSMEMSIZE / VMEM_PAGESIZE)		//!< Total number of (page) frames 
+
 
 /**
  * page table flags used by this simulation
@@ -41,6 +46,7 @@
 
 #define VOID_IDX -1       //!< Constant for invalid page or frame reference 
 
+
 /**
  * Page table entry
  */
@@ -48,6 +54,7 @@ struct pt_entry {
    int flags;             //!< See definition of PTF_* flags 
    int frame;             //!< Frame idx; frame == VOID_IDX: unvalid reference  
 };
+
 
 /**
  * The data structure stored in shared memory
@@ -57,6 +64,8 @@ struct vmem_struct {
     int mainMemory[VMEM_NFRAMES * VMEM_PAGESIZE];  //!< main memory used by virtual memory simulation 
 };
 
+
 #define SHMSIZE (sizeof(struct vmem_struct)) //!< size of virtual memory 
 
-#endif /* VMEM_H */
+
+#endif /* _VMEM_H */

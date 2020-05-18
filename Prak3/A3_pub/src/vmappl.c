@@ -5,6 +5,7 @@
  * @date 2010
  */
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,109 +14,6 @@
 #include "my_rand.h"
 #include "vmappl.h"
 
-/* 
- * Signatures of private (static) functions of this module.
- */
-
-/**
- *****************************************************************************************
- *  @brief      Initialisation of the array to be sorted 
- *
- * It will be called once during start phase.
- * The access the virtual memory via shared memory must be initialized by the
- * first call of the corresponding access function (vmem_read or vmem_write).
- * 
- *  @param      length length of the array to be initialized 
- *
- *  @return     void 
- ****************************************************************************************/
- static void init_data(int length);
-
-/**
- *****************************************************************************************
- *  @brief      Recursive version of QuickSort 
- *
- *  @param      l address of the left-most array element to be sorted
- * 
- *  @param      r address of the right-most array element to be sorted
- *
- *  @return     void 
- ****************************************************************************************/
-static void quicksort(int l, int r);
-
-/**
- *****************************************************************************************
- *  @brief      Bubble sort 
- *
- *  @param      l address of the left-most array element to be sorted
- * 
- *  @param      r address of the right-most array element to be sorted
- *
- *  @return     void 
- ****************************************************************************************/
-static void bubblesort(int l, int r);
-
-/**
- *****************************************************************************************
- *  @brief      This function sorts the array stored in the virtual memory.
- *
- *  @param      length length of the array to be sorted 
- *
- *  @return     void 
- ****************************************************************************************/
-static void sort(int length);
-
-/**
- *****************************************************************************************
- *  @brief      This function swaps two int values of virtual memory 
- *
- *  Call this function to swap two int elements stored at addr1 and addr2 
- *  of virtual memory.
- * 
- *  @param      addr1 address of first elment in virtual memory 
- *
- *  @param      addr2 address of second elment in virtual memory 
- *
- *  @return     void 
- ****************************************************************************************/
-static void swap(int addr1, int addr2);
-
-/**
- *****************************************************************************************
- *  @brief      This function scans all parameters of the porgram.
- *              The corresponding global variables seed and sort_algo will be set.
- * 
- *  @param      argc number of parameter 
- *
- *  @param      argv parameter list 
- *
- *  @return     void 
- ****************************************************************************************/
-static void scan_params(int argc, char **argv);
-
-/**
- *****************************************************************************************
- *  @brief      This function prints the array stored in virtual memory 
- *
- *  It prints the first "length" integer elements of virtual memory.
- *
- *  @param      length length of the array to be initialized 
- *
- *  @return     void 
- ****************************************************************************************/
-static void display_data(int length);
-
-/**
- *****************************************************************************************
- *  @brief      This function prints an error message and the usage information of 
- *              this program.
- *
- *  @param      err_str pointer to the error string that should be printed.
- *
- *  @return     void 
- ****************************************************************************************/
-static void print_usage_info_and_exit(char *err_str);
-
 
 /*
  * static global variables
@@ -123,6 +21,7 @@ static void print_usage_info_and_exit(char *err_str);
 static char *program_name = NULL;
 static int sort_algo      = QUICK_SORT; // select default sort algorithm
 static int seed           = SEED; // select default init value for random number generator 
+
 
 /* 
  * functions of the module 
@@ -165,6 +64,8 @@ void scan_params(int argc, char **argv) {
     } // for loop
 }
 
+
+
 int main(int argc, char **argv) {
     // scan parameter 
 
@@ -197,6 +98,8 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+
+
 void init_data(int length) {
     int i;
     int val;
@@ -210,6 +113,8 @@ void init_data(int length) {
     }   /* end for */
 }
 
+
+
 void display_data(int length) {
     int i;
     for(i = 0; i < length; i++) {
@@ -217,6 +122,8 @@ void display_data(int length) {
         printf("%c", ((i + 1) % NDISPLAYCOLS) ? ' ' : '\n');
     }   /* end for */
 }
+
+
 
 void sort(int length) {
     /* Quicksort */
@@ -233,6 +140,8 @@ void sort(int length) {
     }
 }
 
+
+
 static void bubblesort(int l, int r) {
     int i, j;
     for (i = l; i < r; i ++) {
@@ -243,6 +152,8 @@ static void bubblesort(int l, int r) {
         }
     }
 }
+
+
 
 void quicksort(int l, int r) {
     if(l < r) {
@@ -267,11 +178,15 @@ void quicksort(int l, int r) {
     }   /* end if */
 }
 
+
+
 void swap(int addr1, int addr2) {
     int tmp = vmem_read(addr1);
     vmem_write(addr1, vmem_read(addr2));
     vmem_write(addr2, tmp);
 }
+
+
 
 void print_usage_info_and_exit(char *err_str) {
     fprintf(stderr, "Wrong parameter: %s\n", err_str);
@@ -283,5 +198,6 @@ void print_usage_info_and_exit(char *err_str) {
     fflush(stderr);
     exit(EXIT_FAILURE);
 }
+
 
 // EOF

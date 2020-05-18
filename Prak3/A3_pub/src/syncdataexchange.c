@@ -12,6 +12,7 @@
  ******************************************************************
  */
 
+
 #include "syncdataexchange.h"
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -19,6 +20,7 @@
 #include <sys/shm.h>
 #include <semaphore.h>
 #include "debug.h"
+
 
 #define SHMKEY_SYNC_COM            "./src/syncdataexchange.h"          //!< First paremater for shared memory generation via ftok function
 #define SHMPROCID_SYNC_COM         3112                                //!< Second paremater for shared memory generation via ftok function
@@ -38,12 +40,8 @@ static sem_t *wakeupVmApp = SEM_FAILED;      //!< Named semaphores that informs 
 static bool nextOpWaitForMsg = true;         //!< For checking correct order of waitForMsg and reply (sendAck)
 static int refNoForAck = -1;	             //!< waitForMsg stores refCounter of msg for sendAck
 
-/**
- * @brief  Diese Funktion erzeugt die Ressourcen, die zum synchronnen Austausch
- *         der Daten benötigt werden.
- * @param  isServer Ist dieses Flag true, so wird die Kommunkation für den Server 
- *                  aufgesetzt. Ansonsten für den Client.
- */
+
+
 static void setupSyncDataExchangeInternal(bool isServer) {
    // create shared memory for data to be exchanged
    PRINT_DEBUG((stderr,"setupSyncDataExchangeInternal: Attach to shared memory\n"));
@@ -81,9 +79,13 @@ static void setupSyncDataExchangeInternal(bool isServer) {
    PRINT_DEBUG((stderr, "setupSyncDataExchangeInternal: semaphores successfully created\n"));
 }
 
+
+
 void setupSyncDataExchange(void) {
    setupSyncDataExchangeInternal(true);
 }
+
+
 
 void destroySyncDataExchange(void) {
    // distory shared memory 
@@ -99,7 +101,9 @@ void destroySyncDataExchange(void) {
     PRINT_DEBUG((stderr, "distroySyncDataExchange: Semaphore successfully destroyed\n"));
 }
 
-void sendMsgToMmanager(struct msg msg){
+
+
+void sendMsgToMmanager(struct msg msg) {
     static int refNo = 0; //!< Number of current reference send to memory manager
     msg.ref = refNo; // Wird zur Ueberpruefung der Kommunikation hoch gezaehlt.
     // Beim ersten Aufruf erzeugt der Client die Datenstrukturen
@@ -120,7 +124,9 @@ void sendMsgToMmanager(struct msg msg){
     PRINT_DEBUG((stderr, "Receive Msg form mem manager (cmd = %d, val = %d, ref = %d)\n", sharedData->cmd, sharedData->value, sharedData->ref));
 }
 
-struct msg waitForMsg(void){
+
+
+struct msg waitForMsg(void) {
    // Ueberpruefe Reihenfolge waitForMsg und SendAck
    TEST_AND_EXIT((!nextOpWaitForMsg), (stderr, "waitForMsg:Internal error, waitForMsg call not expected\n"));
    nextOpWaitForMsg = false;
@@ -134,7 +140,9 @@ struct msg waitForMsg(void){
    return *sharedData;
 }
 
-void sendAck(void){
+
+
+void sendAck(void) {
    // Ueberpruefe Reihenfolge waitForMsg und SendAck
    TEST_AND_EXIT((nextOpWaitForMsg), (stderr, "sendAck:Internal error, sendAck call not expected\n"));
    nextOpWaitForMsg = true;
@@ -146,6 +154,7 @@ void sendAck(void){
    sharedData->ref = refNoForAck;
    TEST_AND_EXIT_ERRNO(sem_post(wakeupVmApp) == -1, "sendAck:sem_post failed!");
 }
+
 
 //EOF
 
