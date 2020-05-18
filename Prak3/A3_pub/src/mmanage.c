@@ -245,3 +245,42 @@ static void find_remove_clock(int page, int * removedPage, int *frame){
 
 // EOF
 
+
+/*
+
+FIFO
+- Seiten stehen als verkettete Liste im Speicher
+- Bei Seitenfehler:
+        - Element/Seite mit ältestem Ladezeitpunkt (Listenkopf) wird entfernt
+        - Neues Element am Ende der Liste einfügen
+        -> R-Bit wird nicht benötigt
+        -> keine Unterscheidung zwischen viel und wenig genutzten Seiten
+            (älteste Seite wird ausgelagert)
+
+
+CLOCK
+- 2cFIFO, aber zyklische Liste:
+        ->  Pointer auf Kopfelement
+
+            checkElement(pointer) {
+                if (R == 0) {
+                    Seite löschen bzw. durch neues Element ersetzen; 
+                    R = 1;
+                    Pointer++;
+                }
+                else if (R == 1) {
+                    R = 0;
+                    Pointer++;
+                    checkElement(pointer);
+                }
+            }
+
+
+AGING:
+- Jede Seite hat einen SW-Zähler, der mit 0 initialisiert ist.
+- zyklisch (alle 20 ms):
+        - Zähler um 1 nach rechts shiften (/2)
+        - R-Bit auf MSB (links)
+        - R-Bit zurücksetzen
+        - bei 8-Bit Breite von Age: age beim Einlagern der Seite auf 0x80 setzen
+*/
