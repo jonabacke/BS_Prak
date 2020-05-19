@@ -9,13 +9,13 @@ Queue *initConsumerQueue(char *consumerQueueName)
     mqd_t consumerQueue = createTaskQueue(consumerQueueName, sizeConsumerQueue, sizeof(char));
 
     Queue *queue = check_malloc(sizeof(Queue));
-    queue->length = sizeConsumerQueue;
     queue->queue = consumerQueue;
-    queue->bufferMutex = make_mutex();
     queue->block = make_mutex();
+    queue->flag = TURN_ON;
+    queue->length = sizeConsumerQueue;
+    queue->bufferMutex = make_mutex();
     queue->readPointer = 0;
     queue->writePointer = 0;
-    queue->flag = TURN_ON;
 #ifdef condition /*CONDITION VARIABLES*/
     printf("CONDITION\n");
     queue->buffer_not_empty = make_cond();

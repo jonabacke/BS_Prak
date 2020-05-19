@@ -12,13 +12,13 @@ Queue *initProducerQueue(char *name)
     mqd_t producerQueue = createTaskQueue(name, sizeProducerQueue, sizeof(char));
 
     Queue *queue = check_malloc(sizeof(Queue));
-    queue->length = sizeProducerQueue;
     queue->queue = producerQueue;
-    queue->bufferMutex = make_mutex();
+    queue->flag = TURN_ON;
+    queue->length = sizeProducerQueue;
     queue->block = make_mutex();
+    queue->bufferMutex = make_mutex();
     queue->readPointer = 0;
     queue->writePointer = 0;
-    queue->flag = TURN_ON;
 #ifdef condition /*CONDITION VARIABLES*/
     queue->buffer_not_empty = make_cond();
     queue->buffer_not_full = make_cond();
@@ -49,7 +49,7 @@ void *runProducerQueue(Queue *queue)
 
         mutex_lock(queue->block);
         mutex_unlock(queue->block);
-        printf("schreibe producerTask in Queue\n");
+//        printf("schreibe producerTask in Queue\n");
         writeIntoQueue(queue, &arg, header);
         printf("%c soll in den FIFO gelegt werden\n", arg);
         sleep(ONE_SECOND);

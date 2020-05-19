@@ -29,6 +29,7 @@ void *producerHandler(Queue *queue)
     	struct TaskHeader header2;
         readFromQueue(queue, &arg, &header2);
         (*(header2.routineForTask))(&arg);
+        printf("schreibe %c in FIFO\n", arg);
         sleep(THREE_SECONDS);
     }
     pthread_exit(NULL);
