@@ -20,7 +20,7 @@
 #include "taskQueue.h"
 
 
-#define conditio                  0
+//#define condition                 0
 #define BUFFER_SIZE                 10
 #define THREE_SECONDS               3
 #define TWO_SECONDS                 2

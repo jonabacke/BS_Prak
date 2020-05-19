@@ -17,9 +17,11 @@ Queue *initConsumerQueue(char *consumerQueueName)
     queue->writePointer = 0;
     queue->flag = TURN_ON;
 #ifdef condition /*CONDITION VARIABLES*/
+    printf("CONDITION\n");
     queue->buffer_not_empty = make_cond();
     queue->buffer_not_full = make_cond();
 #else /*SEMAPHORES*/
+    printf("SEMAPHORES\n");
     queue->buffer_elements = make_semaphore(0);
     queue->buffer_capacity = make_semaphore(sizeConsumerQueue - 1);
 #endif

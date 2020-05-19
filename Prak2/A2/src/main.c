@@ -17,13 +17,11 @@
 #include "producerGeneraterThread.h"
 
 pthread_t threadControl;
-
-void cond_destroy(Cond *cond)
-{
-    int n = pthread_cond_destroy(cond);
-    HANDLE_ERR(n);
-}
-
+//void cond_destroy(Cond *cond)
+//{
+//    int n = pthread_cond_destroy(cond);
+//    HANDLE_ERR(n);
+//}
 
 
 /* @brief   In the main the threads are created and at the end their remains destroyed.

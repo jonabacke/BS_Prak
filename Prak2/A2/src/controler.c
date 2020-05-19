@@ -134,11 +134,13 @@ void cancelAll(char *producerQueueName, char *consumerQueueName)
 	for (int i = 0; i < AMOUNTPRODUCER; ++ i) {
 		int tc3 = pthread_cancel(producerThread[i]);
 	    HANDLE_ERR(tc3);
+	    pthread_join(producerThread[i], NULL);
 	}
 
 	for (int i = 0; i < AMOUNTCONSUMER; ++ i) {
 		int tc4 = pthread_cancel(consumerThread[i]);
 	    HANDLE_ERR(tc4);
+	    pthread_join(consumerThread[i], NULL);
 	}
     if (producerQueue->flag == TURN_OFF)
     {
@@ -148,9 +150,17 @@ void cancelAll(char *producerQueueName, char *consumerQueueName)
     {
         toggleThread(consumerQueue);
     }
+    pthread_join(producerGenerator, NULL);
+    pthread_join(consumerGenerator, NULL);
 
     deleteAll(producerQueueName, consumerQueueName);
     pthread_exit(NULL);
+}
+
+
+void cond_destroy(Cond *cond) {
+    int n = pthread_cond_destroy(cond);
+    HANDLE_ERR(n);
 }
 
 
@@ -174,20 +184,14 @@ void deleteAll(char *producerQueueName, char *consumerQueueName)
 
 
 
-     int f = pthread_mutex_destroy(producerQueue->bufferMutex);
-     HANDLE_ERR(f);
-     f = pthread_mutex_destroy(producerQueue->block);
-     HANDLE_ERR(f);
-     f = pthread_mutex_destroy(consumerQueue->bufferMutex);
+     int f = pthread_mutex_destroy(producerQueue->block);
      HANDLE_ERR(f);
      f = pthread_mutex_destroy(consumerQueue->block);
      HANDLE_ERR(f);
 
 #ifdef condition /*Conditional Variables*/
-     f = cond_destroy(producerQueue->buffer_not_empty);
-     HANDLE_ERR(f);
-     int f = cond_destroy(producerQueue->buffer_not_full);
-     HANDLE_ERR(f);
+     cond_destroy(producerQueue->buffer_not_empty);
+     cond_destroy(producerQueue->buffer_not_full);
 #else /*Semaphores*/
     printf("Destroying Semaphores.....\n");
      f = sem_destroy(producerQueue->buffer_elements);
@@ -205,13 +209,16 @@ void deleteAll(char *producerQueueName, char *consumerQueueName)
     free(producerQueue->buffer_capacity);
 #endif
 
+    f = pthread_mutex_destroy(producerQueue->bufferMutex);
+    HANDLE_ERR(f);
+
+    f = pthread_mutex_destroy(consumerQueue->bufferMutex);
+    HANDLE_ERR(f);
 
 
 #ifdef condition /*Conditional Variables*/
-     f = cond_destroy(consumerQueue->buffer_not_empty);
-     HANDLE_ERR(f);
-     f = cond_destroy(consumerQueue->buffer_not_full);
-     HANDLE_ERR(f);
+     cond_destroy(consumerQueue->buffer_not_empty);
+     cond_destroy(consumerQueue->buffer_not_full);
 #else /*Semaphores*/
     printf("Destroying Semaphores.....\n");
      f = sem_destroy(consumerQueue->buffer_elements);

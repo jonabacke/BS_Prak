@@ -42,4 +42,6 @@ void cancelAll(char *producerQueueName, char *consumerQueueName);
 
 void deleteAll(char *producerQueueName, char *consumerQueueName);
 
+void cond_destroy(Cond *cond);
+
 #endif /*_CONTROLER_H*/
