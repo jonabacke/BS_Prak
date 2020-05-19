@@ -93,14 +93,14 @@ int main(int argc, char **argv) {
     while(1) {
         struct msg m = waitForMsg();
         switch(m.cmd){
-	   case CMD_PAGEFAULT:
+	    case CMD_PAGEFAULT:
                  allocate_page(m.value, m.g_count);
-              break;
-           case CMD_TIME_INTER_VAL:
+            break;
+        case CMD_TIME_INTER_VAL:
                 if (pageRepAlgo == find_remove_aging) {
                    update_age_reset_ref();
                 }
-              break;
+            break;
            default:
               TEST_AND_EXIT(true, (stderr, "Unexpected command received from vmapp\n"));
         }
@@ -206,21 +206,40 @@ void cleanup(void) {
 void vmem_init(void) {
     //TODO:
 
+    
     /* Create System V shared memory */
-
+    key_t key = ftok(SHMKEY, SHMPROCID);
+    
     /* We are creating the shm, so set the IPC_CREAT flag */
+    int shm_id = shmget(key, SHMSIZE, IPC_CREAT | 0666);
+    TEST_AND_EXIT_ERRNO(shm_id, "shmget error");
+
+    for (int i = 0; i < VMEM_NPAGES; i++) {
+        vmem->pt[i].flags = 0;                  //flags auf '0' setzen
+        vmem->pt[i].frame = VOID_IDX;           //frame nicht zugeteilt (-1)
+    }
 
     /* Attach shared memory to vmem (virtual memory) */
+
+    int shm = shmat(shm_id, NULL, 0);
+    TEST_AND_EXIT_ERRNO(shm, "shmat error");
 
     /* Fill with zeros */
     memset(vmem, 0, SHMSIZE);
 }
 
 int find_unused_frame() {
-    //TODO:
-    /*
-    - freien Seitenrahmen suchen
-    */
+    
+    /* freien Seitenrahmen suchen */
+    for (int i = 0; i < VMEM_NPAGES; i = i + 8) {
+        if (vmem->pt[i].flags == 0) 
+        {
+            return i;
+        }
+        else continue;
+    }
+    /* kein freier pageframe gefunden*/
+    return VOID_IDX; 
 }
 
 void allocate_page(const int req_page, const int g_count) {
@@ -230,13 +249,10 @@ void allocate_page(const int req_page, const int g_count) {
     le.replaced_page = removedPage;
     le.alloc_frame = frame;
     le.g_count = g_count; 
-    le.pf_count = pf_count;
+    le.pf_count = pf_count;         //log page fault
     logger(le);
-    //TODO:
-    /*
-    - update page table
-    - log page fault
-    */
+    //TODO: call replacement algo from here? //update page table
+    
 }
 
 void fetchPage(int page, int frame){
