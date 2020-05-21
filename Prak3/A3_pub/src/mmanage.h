@@ -9,6 +9,27 @@
 #define _MMANAGE_H
 
 
+#include "vmem.h"
+
+
+typedef struct fifo_element_struct
+{
+    int page;
+    int previousPage;
+    int nextPage;
+} Fifo_page;
+
+
+typedef struct fifo_struct 
+{
+    //int *bufferContent;
+    Fifo_page fifoContent[VMEM_NFRAMES];
+    Fifo_page firstElement;
+    Fifo_page lastElement;
+}FIFO;
+
+
+
 /*
  * Signatures of private / static functions
  */
@@ -175,6 +196,11 @@ static void find_remove_fifo(int page, int * removedPage, int *frame);
  *
  ****************************************************************************************/
 static void find_remove_clock(int page, int * removedPage, int *frame);
+
+
+
+//!TODO:....
+int findPageToRemove();
 
 
 

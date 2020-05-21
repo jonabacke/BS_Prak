@@ -27,7 +27,7 @@
 #include "pagefile.h"
 #include "logger.h"
 #include "syncdataexchange.h"
-#include "vmem.h"
+
 
 
 
@@ -54,6 +54,8 @@ struct age age[VMEM_NFRAMES];
 
 
 static struct vmem_struct *vmem = NULL; //!< Reference to shared memory
+
+FIFO *fifo;
 
 
 
@@ -134,6 +136,14 @@ void scan_params(int argc, char **argv)
         {
             // page replacement strategies fifo selected 
             pageRepAlgo = find_remove_fifo;
+
+            fifo->firstElement.page = NULL;
+            fifo->firstElement.previousPage = NULL;
+            fifo->firstElement.nextPage = NULL;
+            fifo->lastElement.page = NULL;
+            fifo->lastElement.previousPage = NULL;
+            fifo->lastElement.nextPage = NULL;
+
             param_ok = true;
         }
         if (0 == strcasecmp("-clock", argv[i])) 
@@ -289,14 +299,20 @@ void allocate_page(const int req_page, const int g_count)
 
     if (frame != VOID_IDX)              //...unused frame found:  
     {
-        fetchPage(req_page, frame);     //-> put requested page to page frame
+        /* call page replacement algo to place a page without removing a page */
+        if (pageRepAlgo == find_remove_fifo) find_remove_fifo(req_page, NULL, frame);
+        else if (pageRepAlgo == find_remove_clock) find_remove_clock(req_page, NULL, frame);
+        else /*(pageRepAlgo == find_remove_aging)*/ find_remove_aging(req_page, NULL, frame);    
     }
     else                                //...no unused page frames left:
     {
-        //find remove algo action...
-        if (pageRepAlgo == find_remove_fifo) find_remove_fifo();
-        else if (pageRepAlgo == find_remove_clock) find_remove_clock();
-        else /*(pageRepAlgo == find_remove_aging)*/ find_remove_aging();    
+        removedPage = findPageToRemove();
+        frame = vmem->pt[removedPage].frame;
+
+        /* call page replacement algo */
+        if (pageRepAlgo == find_remove_fifo) find_remove_fifo(req_page, removedPage, frame);
+        else if (pageRepAlgo == find_remove_clock) find_remove_clock(req_page, removedPage, frame);
+        else /*(pageRepAlgo == find_remove_aging)*/ find_remove_aging(req_page, removedPage, frame);    
     }
                                         
 
@@ -311,6 +327,29 @@ void allocate_page(const int req_page, const int g_count)
     //TODO: call replacement algo from here? //update page table
     
     //!ack?
+}
+
+
+
+//!TODO: implementieren..
+int findPageToRemove()
+{
+    int pageToRemove;
+
+    if (pageRepAlgo == find_remove_fifo)
+    {
+        pageToRemove = fifo->firstElement.page;   //first element of fifo to be removed
+    }
+    else if (pageRepAlgo == find_remove_clock)
+    {
+
+    }
+    else /*(pageRepAlgo == find_remove_aging)*/ 
+    {
+
+    }
+
+    return pageToRemove;
 }
 
 
@@ -351,21 +390,32 @@ void removePage(int page)
 
 
 
+
+
+
 void find_remove_fifo(int page, int * removedPage, int *frame)
-{
-    //TODO:
-    /*
-    -bei Seitenfehler: 
-            logger();
-    FIFO
-    - Seiten stehen als verkettete Liste im Speicher
-    - Bei Seitenfehler:
-        - Element/Seite mit ältestem Ladezeitpunkt (Listenkopf) wird entfernt
-        - Neues Element am Ende der Liste einfügen
-        -> R-Bit wird nicht benötigt
-        -> keine Unterscheidung zwischen viel und wenig genutzten Seiten
-            (älteste Seite wird ausgelagert)
-    */
+{    
+    if (removedPage != NULL)    //found a page to remove
+    {   
+        /* remove page to free page frame */
+        removePage(removedPage);
+
+        /* remove page element from the head of the fifo list */
+        fifo->firstElement.page = fifo->firstElement.nextPage;
+        fifo->firstElement.previousPage = NULL;
+    }
+
+    /* fetch page from pagefile */
+    fetchPage(page, frame);
+
+    /* insert new page element at the end of the fifo list */
+    Fifo_page temp;
+    temp.page = page;
+    temp.previousPage = fifo->lastElement.page;
+    temp.nextPage = NULL;
+    fifo->lastElement = temp;
+
+    //!TODO: fifo struct ggf. unnötig; //bisher kein malloc usw.; //umgang mit doppelt verketteter Liste korrekt? ^^
 }
 
 
