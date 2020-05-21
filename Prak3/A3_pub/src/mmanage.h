@@ -20,7 +20,7 @@
  *  @brief      This function fetchs a page from disk into memory. The page table 
  *              will be updated.
  *
- *  @param      page Number of the page that should be removed
+ *  @param      page Number of the page that should be fetched
  *  @param      frame Number of frame that should contain the page.
  * 
  *  @return     void 

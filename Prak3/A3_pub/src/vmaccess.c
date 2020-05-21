@@ -32,6 +32,8 @@ static int ref = 0;
 
 #define TIME_WINDOW 20
 
+
+
 static void vmem_init(void)
 {
     //TODO:
@@ -47,6 +49,8 @@ static void vmem_init(void)
     vmem = shmat(shm_id, NULL, 0);
     TEST_AND_EXIT_ERRNO(vmem, "shmat error");
 }
+
+
 
 static void vmem_put_page_into_mem(int address)
 {
@@ -80,39 +84,47 @@ static void vmem_put_page_into_mem(int address)
     g_count++;
 }
 
+
+
 int vmem_read(int address)
 {
     //TODO:
     /*
     - read und write berechnen aus der virtuellen Speicheradresse die Framenummer und den Offset:
 
-    int seitenNummer = (address & 0x1000) >> 3;
-    int offset = address & 0x0111;
+    int page = (address & 0x1000) >> 3;             //page: Bit 12-15
+    int offset = address & 0x0111;                  //Offset: Bit 0-11
     
-    if (vmem->pt[seitenNummer].frame == VOID_IDX) 
+    if (vmem->pt[page].frame == VOID_IDX)           //Seitenfehler: no frame reference in page table
     {
-        vmem_put_page_into_mem(address); // Seitenfehler: no frame reference in page table   (pagefile -> mainMemory)
+        vmem_put_page_into_mem(address);            //-> put page to frame in mainMemory
     } 
-    else 
+    else                                            //frame reference for page in page table
     {
-        int pageFrameNummer = vmem->pt[seitenNummer].frame;
+        int pageFrame = vmem->pt[page].frame;       //-> get page frame from page table
     }
-
     */
+
+
+    /*Initialize the virtual memory if accessed for the first time*/
     if (vmem == NULL)
     {
         vmem_init();
     }
 
-    vmem_put_page_into_mem(address);
-
     int page = address / VMEM_PAGESIZE;
     int offset = address % VMEM_PAGESIZE;
-
     int frame = vmem->pt[page].frame;
 
-    return vmem->mainMemory[frame * VMEM_PAGESIZE + offset];
+    vmem_put_page_into_mem(address);                                //put page to frame in mainMemory
+
+    int value = vmem->mainMemory[frame * VMEM_PAGESIZE + offset];   //read from memory
+    vmem->pt[page].flags = vmem->pt[page].flags | PTF_REF;          //set R-Bit
+
+    return value;
 }
+
+
 
 void vmem_write(int address, int data)
 {
@@ -122,6 +134,8 @@ void vmem_write(int address, int data)
     - wenn die benötigte Seite nicht geladen ist 
             -> vmem_put_page_into_mem(address); (pagefile -> mainMemory)
     */
+
+    /*Initialize the virtual memory if accessed for the first time*/
     if (vmem == NULL)
     {
         vmem_init();
@@ -129,14 +143,15 @@ void vmem_write(int address, int data)
 
     int page = address / VMEM_PAGESIZE;
     int offset = address % VMEM_PAGESIZE;
-
-    vmem_put_page_into_mem(address);
-
     int frame = vmem->pt[page].frame;
 
-    vmem->mainMemory[frame * VMEM_PAGESIZE + offset] = data;
-    vmem->pt[page].flags = vmem->pt[page].flags | PTF_DIRTY | PTF_REF;
+    vmem_put_page_into_mem(address);                                        //put page to frame in mainMemory
+
+    vmem->mainMemory[frame * VMEM_PAGESIZE + offset] = data;                //write in memory
+    vmem->pt[page].flags = vmem->pt[page].flags | PTF_DIRTY | PTF_REF;      //set flags (dirty & R-Bit)
 }
+
+
 
 extern void vmem_close(void)
 {
