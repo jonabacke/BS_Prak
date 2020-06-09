@@ -10,6 +10,7 @@
 
 
 #include "vmem.h"
+#include <semaphore.h>
 
 
 typedef struct fifo_element_struct
@@ -26,7 +27,14 @@ typedef struct fifo_struct
     Fifo_page fifoContent[VMEM_NFRAMES];
     Fifo_page firstElement;
     Fifo_page lastElement;
-}FIFO;
+} FIFO;
+
+
+typedef struct clock_struct 
+{
+    struct pt_entry clockContent[VMEM_NFRAMES];
+    int elementPointer;
+} CLOCK;
 
 
 
@@ -196,6 +204,11 @@ static void find_remove_fifo(int page, int * removedPage, int *frame);
  *
  ****************************************************************************************/
 static void find_remove_clock(int page, int * removedPage, int *frame);
+
+
+
+//!TODO: ....
+int bufferPointer_incr(int next);
 
 
 

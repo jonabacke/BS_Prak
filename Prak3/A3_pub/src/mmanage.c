@@ -56,6 +56,7 @@ struct age age[VMEM_NFRAMES];
 static struct vmem_struct *vmem = NULL; //!< Reference to shared memory
 
 FIFO *fifo;
+CLOCK *clock;
 
 
 
@@ -150,6 +151,9 @@ void scan_params(int argc, char **argv)
         {
             // page replacement strategies clock selected 
             pageRepAlgo = find_remove_clock;
+
+            clock->elementPointer = 0;
+
             param_ok = true;
         }
         if (0 == strcasecmp("-aging", argv[i])) 
@@ -327,6 +331,7 @@ void allocate_page(const int req_page, const int g_count)
     //TODO: call replacement algo from here? //update page table
     
     //!ack?
+    sendAck();
 }
 
 
@@ -334,7 +339,7 @@ void allocate_page(const int req_page, const int g_count)
 //!TODO: implementieren..
 int findPageToRemove()
 {
-    int pageToRemove;
+    int pageToRemove = NULL;
 
     if (pageRepAlgo == find_remove_fifo)
     {
@@ -342,7 +347,18 @@ int findPageToRemove()
     }
     else if (pageRepAlgo == find_remove_clock)
     {
-
+        while (pageToRemove == NULL)
+        {
+            if (clock->clockContent[clock->elementPointer].flags == PTF_REF)
+            {
+                pageToRemove = clock->clockContent[clock->elementPointer];
+            }
+            else
+            {
+                
+            }
+            
+        }
     }
     else /*(pageRepAlgo == find_remove_aging)*/ 
     {
@@ -468,9 +484,20 @@ static void find_remove_clock(int page, int * removedPage, int *frame)
                 }
             }
     */
+  
 }
 
+
+
+int bufferPointer_incr(int next)
+{
+    return (next + 1) % VMEM_NFRAMES;
+}
+
+
+
 // EOF
+
 
 
 /*
