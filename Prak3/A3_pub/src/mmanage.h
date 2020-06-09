@@ -13,6 +13,15 @@
 #include <semaphore.h>
 #include <stdint.h>
 
+#include <signal.h>
+#include <string.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#include "debug.h"
+#include "pagefile.h"
+#include "logger.h"
+#include "syncdataexchange.h"
 
 typedef struct aging_struct
 {

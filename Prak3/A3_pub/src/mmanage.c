@@ -17,16 +17,7 @@
  *
  */
 
-#include <signal.h>
-#include <string.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-
 #include "mmanage.h"
-#include "debug.h"
-#include "pagefile.h"
-#include "logger.h"
-#include "syncdataexchange.h"
 
 /*
  * variables for memory management
@@ -50,7 +41,6 @@ struct age
 struct age age[VMEM_NFRAMES];
 
 static struct vmem_struct *vmem = NULL; //!< Reference to shared memory
-
 
 int main(int argc, char **argv)
 {
@@ -273,6 +263,7 @@ void allocate_page(const int req_page, const int g_count)
 {
     int frame = find_unused_frame(); //finde freien page frame...
     int *removedPage = NULL;
+    pf_count ++;
 
     if (frame != VOID_IDX) //...unused frame found:
     {
@@ -296,6 +287,8 @@ void allocate_page(const int req_page, const int g_count)
             find_remove_clock(req_page, removedPage, &frame);
         else /*(pageRepAlgo == find_remove_aging)*/
             find_remove_aging(req_page, removedPage, &frame);
+
+        //TODO: call replacement algo from here? //update page table
     }
 
     /* Log action */
@@ -305,7 +298,6 @@ void allocate_page(const int req_page, const int g_count)
     le.g_count = g_count;
     le.pf_count = pf_count; //log page fault
     logger(le);
-    //TODO: call replacement algo from here? //update page table
 
     //!ack?
     sendAck();
@@ -367,7 +359,7 @@ void removePage(int page)
     if (vmem->pt[page].flags == PTF_DIRTY) //check dirty flag
     {
         int value = vmem->mainMemory[frame * VMEM_PAGESIZE + offset]; //read changed page from memory
-        store_page_to_pagefile(value, &address);                       //save changed page in pagefile
+        store_page_to_pagefile(value, &address);                      //save changed page in pagefile
     }
 
     /* Update page table */
@@ -431,12 +423,12 @@ static void update_age_reset_ref(void)
     {
         if (aging[i].swCounter > 0)
         {
-             aging[i].swCounter = aging[i].swCounter >> 1;
+            aging[i].swCounter = aging[i].swCounter >> 1;
         }
         if ((aging[i].aging.flags & PTF_REF) == 1)
         {
             aging[i].swCounter = aging[i].swCounter | 0x80u;
-        }        
+        }
         aging[i].aging.flags = aging[i].aging.flags & ~PTF_REF;
     }
 }
@@ -444,7 +436,7 @@ static void update_age_reset_ref(void)
 static void find_remove_clock(int page, int *removedPage, int *frame)
 {
 
-        if (removedPage != NULL) //found a page to remove
+    if (removedPage != NULL) //found a page to remove
     {
         /* remove page to free page frame */
         removePage(*removedPage);
@@ -455,7 +447,6 @@ static void find_remove_clock(int page, int *removedPage, int *frame)
 
     clock[*removedPage].frame = *frame;
     clock[*removedPage].flags = PTF_PRESENT | PTF_REF;
-
 
     //TODO:
     /*
@@ -479,7 +470,6 @@ static void find_remove_clock(int page, int *removedPage, int *frame)
             }
     */
 }
-
 
 // EOF
 

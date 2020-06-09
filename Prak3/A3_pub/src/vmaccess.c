@@ -58,11 +58,11 @@ static void vmem_put_page_into_mem(int address)
     /* Speicherverwaltung auffordern, Seite aus dem <pagefile> in den Hauptspeicher zu laden: */
 
     int page = address / VMEM_PAGESIZE;
-    int offset = address % VMEM_PAGESIZE;
+//    int offset = address % VMEM_PAGESIZE;
     struct msg msg;
 
     /* Prüfen, ob page in einem pageframe ist. */
-    if (vmem->pt[page].frame == VOID_IDX) //! Vllt besser PTF_PRESENT checken?
+    if (vmem->pt[page].flags != PTF_PRESENT) //! Vllt besser PTF_PRESENT checken?
     {
         msg.cmd = CMD_PAGEFAULT; // value gibt die einzulagernde Page mit
         msg.value = address;
