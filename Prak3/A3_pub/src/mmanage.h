@@ -11,32 +11,25 @@
 
 #include "vmem.h"
 #include <semaphore.h>
+#include <stdint.h>
 
 
-typedef struct fifo_element_struct
+typedef struct aging_struct
 {
-    int page;
-    int previousPage;
-    int nextPage;
-} Fifo_page;
+    struct pt_entry aging;
+    uint8_t swCounter;
+} Aging;
 
 
-typedef struct fifo_struct 
-{
-    //int *bufferContent;
-    Fifo_page fifoContent[VMEM_NFRAMES];
-    Fifo_page firstElement;
-    Fifo_page lastElement;
-} FIFO;
+struct pt_entry fifo[VMEM_NPAGES];
+int fifoPointer = 0;
 
 
-typedef struct clock_struct 
-{
-    struct pt_entry clockContent[VMEM_NFRAMES];
-    int elementPointer;
-} CLOCK;
+struct pt_entry clock[VMEM_NPAGES];
+int clockPointer = 0;
 
 
+Aging aging[VMEM_NPAGES];
 
 /*
  * Signatures of private / static functions
@@ -207,13 +200,18 @@ static void find_remove_clock(int page, int * removedPage, int *frame);
 
 
 
-//!TODO: ....
-int bufferPointer_incr(int next);
-
-
-
-//!TODO:....
-int findPageToRemove();
+/**
+ *****************************************************************************************
+ * @brief   Find a page to remove from the page frame depending on the chosen page 
+ *          replacement algorithm in case of a page fault:
+ *          find_remove_fifo --> 'eldest' page will be removed
+ *          find_remove_clock --> 'eldest' page with R-Bit == 0 will be removed
+ *          find_remove_aging --> actually least referenced page will be removed
+ * 
+ * @param pageToRemove  Pointer to the page to remove from the page frame
+ * 
+ ****************************************************************************************/
+void findPageToRemove(int *pageToRemove);
 
 
 
