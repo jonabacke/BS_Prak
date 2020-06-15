@@ -42,11 +42,6 @@ struct age age[VMEM_NFRAMES];
 
 static struct vmem_struct *vmem = NULL; //!< Reference to shared memory
 
-void checkAddrSpace(int address, int addrSpace)
-{
-    TEST_AND_EXIT((address > (addrSpace - 1)) || address < 0, (stderr, "vmaccess: not in Address space. Space: [%d]. Called Address: [%d]\n", addrSpace, address));
-}
-
 int main(int argc, char **argv)
 {
     struct sigaction sigact;
@@ -86,7 +81,6 @@ int main(int argc, char **argv)
     // Server Loop, waiting for commands from vmapp
     while (1)
     {
-    	printf("waitForCmd");
         struct msg m = waitForMsg();
         switch (m.cmd)
         {
@@ -266,6 +260,7 @@ int find_unused_frame()
     if (frameCounter < VMEM_NFRAMES)
     {
         unusedFrame = frameCounter;
+        frameCounter++;
     }
 
     /* kein freier pageframe gefunden*/
@@ -275,9 +270,11 @@ int find_unused_frame()
 void allocate_page(const int req_page, const int g_count)
 {
     PDEBUG("allocate_page");
-    int frame = find_unused_frame(); //finde freien page frame...
-    int removedPage = VOID_IDX;
     pf_count++;
+
+    PRINT_DEBUG((stderr, "allocate Page called reqPage: %d\n", req_page));
+    int removedPage = VOID_IDX;
+    int frame = find_unused_frame(); //finde freien page frame...
 
     if (frame == VOID_IDX) //...unused frame found:
     {
@@ -311,47 +308,47 @@ void allocate_page(const int req_page, const int g_count)
     logger(le);
 
     //!ack?
-//    sendAck();
+    //    sendAck();
 }
 
-//!TODO: implementieren..
-void findPageToRemove(int *pageToRemove)
-{
+// //!TODO: implementieren..
+// void findPageToRemove(int *pageToRemove)
+// {
 
-    PDEBUG("findPageToRemove");
-    if (pageRepAlgo == find_remove_fifo)
-    {
-        // pageToRemove = fifo->firstElement.page;   //first element of fifo to be removed
+//     PDEBUG("findPageToRemove");
+//     if (pageRepAlgo == find_remove_fifo)
+//     {
+//         // pageToRemove = fifo->firstElement.page;   //first element of fifo to be removed
 
-        fifoPointer = (fifoPointer + 1) % VMEM_NFRAMES;
-        *pageToRemove = fifoPointer;
-    }
-    else if (pageRepAlgo == find_remove_clock)
-    {
-//        while ((clock[clockPointer].flags & PTF_REF) == PTF_REF)
-//        {
-//            clock[clockPointer].flags = clock[clockPointer].flags & ~PTF_REF;
-//            clockPointer = (clockPointer + 1) % VMEM_NFRAMES;
-//            *pageToRemove = clockPointer;
-//        }
-        *pageToRemove = clockPointer;
-    }
-    else if (pageRepAlgo == find_remove_aging)
-    {
-        *pageToRemove = 0;
-        for (int i = 0; i < VMEM_NPAGES; i++)
-        {
-            if (aging[i].swCounter < aging[*pageToRemove].swCounter)
-            {
-                *pageToRemove = i;
-            }
-        }
-    }
-}
+//         fifoPointer = (fifoPointer + 1) % VMEM_NFRAMES;
+//         *pageToRemove = fifoPointer;
+//     }
+//     else if (pageRepAlgo == find_remove_clock)
+//     {
+//         //        while ((clock[clockPointer].flags & PTF_REF) == PTF_REF)
+//         //        {
+//         //            clock[clockPointer].flags = clock[clockPointer].flags & ~PTF_REF;
+//         //            clockPointer = (clockPointer + 1) % VMEM_NFRAMES;
+//         //            *pageToRemove = clockPointer;
+//         //        }
+//         *pageToRemove = clockPointer;
+//     }
+//     else if (pageRepAlgo == find_remove_aging)
+//     {
+//         *pageToRemove = 0;
+//         for (int i = 0; i < VMEM_NPAGES; i++)
+//         {
+//             if (aging[i].swCounter < aging[*pageToRemove].swCounter)
+//             {
+//                 *pageToRemove = i;
+//             }
+//         }
+//     }
+// }
 
 void fetchPage(int page, int frame)
 {
-    PDEBUG("fetchPage");
+    PRINT_DEBUG((stderr, "fetchPage called. Page: %d, Frame: %d\n", page, frame));
     int newFrameContent[VMEM_PAGESIZE] = {0};
     /* fetch page from pagefile and write it to virtual memory*/
     fetch_page_from_pagefile(page, newFrameContent);
@@ -366,8 +363,8 @@ void fetchPage(int page, int frame)
     }
 
     /* Update page table */
-    vmem->pt[page].frame = frame;                              //set page frame reference
-    vmem->pt[page].flags = vmem->pt[page].flags | PTF_PRESENT; //set Present-Bit and R-Bit
+    vmem->pt[page].frame = frame;       //set page frame reference
+    vmem->pt[page].flags = PTF_PRESENT; //set Present-Bit and R-Bit
 
     //TODO: fehlt noch etwas? muss R-Bit gesetzt werden?
 }
@@ -435,14 +432,36 @@ void find_remove_fifo(int page, int *removedPage, int *frame)
 
     /* insert new page element at the end of the fifo list */
     fifo[fifoPointer] = page;
-    *frame = fifo[fifoPointer];
+    *frame = fifoPointer;
     fifoPointer++;
     fifoPointer = fifoPointer % VMEM_NFRAMES;
+}
+
+static void initAging()
+{
+    static bool isInit = false;
+    if (!isInit)
+    {
+        isInit = true;
+        for (int i = 0; i < VMEM_NPAGES; i++)
+        {
+            int currFlag = vmem->pt[i].flags;
+            if (currFlag != 0)
+            {
+                int frameNum = vmem->pt[i].frame;
+                checkAddrSpace(frameNum, VMEM_NFRAMES);
+                age[frameNum].page = i; // Wird die seite (i) an die frame stelle der Queue geschrieben
+                                        //age[frameNum].refBit = false;
+            }
+        }
+        update_age_reset_ref();
+    }
 }
 
 static void find_remove_aging(int page, int *removedPage, int *frame)
 {
     PDEBUG("find_remove_aging");
+    initAging();
     checkAddrSpace(page, VMEM_NPAGES);
     // if (removedPage != NULL) //found a page to remove
     // {
@@ -453,9 +472,27 @@ static void find_remove_aging(int page, int *removedPage, int *frame)
     /* fetch page from pagefile */
     // fetchPage(page, *frame);
 
-    aging[*removedPage].aging.frame = *frame;
-    aging[*removedPage].aging.flags = PTF_PRESENT | PTF_REF;
-    aging[*removedPage].swCounter = 0x80;
+    if (vmem->pt[page].frame == VOID_IDX)
+    {
+        int oldestFrame = 0;
+
+        for (int i = 0; i < VMEM_NFRAMES; i++)
+        {
+            if (age[i].age <= age[oldestFrame].age)
+            {
+                oldestFrame = i;
+            }
+        }
+
+        // set Ouput Parameters
+        *removedPage = age[oldestFrame].page;
+        *frame = oldestFrame;
+
+        // Insert new Page
+        age[oldestFrame].page = page;
+        age[oldestFrame].age = 1 << (AGE_REGISTER_SIZE - 1);
+    }
+
     //TODO:
     /*
     -bei Seitenfehler: 
@@ -476,15 +513,18 @@ static void update_age_reset_ref(void)
     //TODO:
     for (int i = 0; i < VMEM_NPAGES; i++)
     {
-        if (aging[i].swCounter > 0)
+        u_int8_t mask = 0;
+        if ((vmem->pt[i].flags & PTF_PRESENT) == PTF_PRESENT)
         {
-            aging[i].swCounter = aging[i].swCounter >> 1;
+            if (((vmem->pt[i].flags & PTF_REF) == PTF_REF))
+            {
+                vmem->pt[i].flags = vmem->pt[i].flags & (~PTF_REF); // Reset des Ref bits
+                mask = (1 >> (AGE_REGISTER_SIZE - 1));
+            }
+            int currFrame = vmem->pt[i].frame;
+            age[currFrame].age = (age[currFrame].age >> 1) | mask;
+            PRINT_DEBUG((stderr, "updated age from frame [%d]. New Age: [%u] Mask:[%u]\n", i, (unsigned int)age[i].age, mask));
         }
-        if ((aging[i].aging.flags & PTF_REF) == PTF_REF)
-        {
-            aging[i].swCounter = aging[i].swCounter | 0x80u;
-        }
-        aging[i].aging.flags = aging[i].aging.flags & ~PTF_REF;
     }
 }
 
@@ -541,8 +581,6 @@ static void find_remove_clock(int page, int *removedPage, int *frame)
     *frame = clockPointer;
     clockPointer++;
     clockPointer = clockPointer % VMEM_NFRAMES;
-
-
 
     //TODO:
     /*

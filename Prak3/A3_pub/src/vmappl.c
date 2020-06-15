@@ -118,8 +118,7 @@ void init_data(int length) {
 void display_data(int length) {
     int i;
     for(i = 0; i < length; i++) {
-        int read = vmem_read(i);
-        printf("%10d", read);
+        printf("%10d", vmem_read(i));
         printf("%c", ((i + 1) % NDISPLAYCOLS) ? ' ' : '\n');
     }   /* end for */
 }

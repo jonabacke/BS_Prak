@@ -1,2 +1,0 @@
-Page fault          1, Global count          0:
-Removed:         -1, Allocated:          0, Frame:          0

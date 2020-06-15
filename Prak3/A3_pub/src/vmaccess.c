@@ -41,8 +41,6 @@ static int ref = 0;
  ****************************************************************************************/
 static void vmem_init(void);
 
-
-
 /**
  *****************************************************************************************
  *  @brief      This function puts a page into memory (if required). Ref Bit of page table
@@ -59,6 +57,11 @@ static void vmem_init(void);
  *  @return     void
  ****************************************************************************************/
 static void vmem_put_page_into_mem(int address);
+
+void checkAddrSpace(int address, int addrSpace)
+{
+    TEST_AND_EXIT((address > (addrSpace - 1)) || address < 0, (stderr, "vmaccess: not in Address space. Space: [%d]. Called Address: [%d]\n", addrSpace, address));
+}
 
 static void vmem_init(void)
 {
@@ -84,6 +87,7 @@ static void vmem_put_page_into_mem(int address)
     //TODO:
     /* Speicherverwaltung auffordern, Seite aus dem <pagefile> in den Hauptspeicher zu laden: */
 
+    checkAddrSpace(address, VMEM_VIRTMEMSIZE);
     int page = address / VMEM_PAGESIZE;
     //    int offset = address % VMEM_PAGESIZE;
     struct msg msg;
@@ -111,7 +115,7 @@ static void vmem_put_page_into_mem(int address)
         msg.cmd = CMD_TIME_INTER_VAL; //for aging algo
         msg.g_count = g_count;
         sendMsgToMmanager(msg);
-//        waitForMsg();
+        //        waitForMsg();
     }
     g_count++;
 }
@@ -151,7 +155,7 @@ int vmem_read(int address)
     PDEBUG("read from memory");
     int value = vmem->mainMemory[frame * VMEM_PAGESIZE + offset]; //read from memory
     PDEBUG("set R-Bit");
-    vmem->pt[page].flags = vmem->pt[page].flags | PTF_REF; //set R-Bit
+    vmem->pt[page].flags = vmem->pt[page].flags | PTF_REF | PTF_PRESENT; //set R-Bit
 
     return value;
 }
@@ -181,7 +185,7 @@ void vmem_write(int address, int data)
     PDEBUG("write in memory");
     vmem->mainMemory[frame * VMEM_PAGESIZE + offset] = data; //write in memory
     PDEBUG("set flags (dirty & R-Bit)");
-    vmem->pt[page].flags = vmem->pt[page].flags | PTF_DIRTY | PTF_REF; //set flags (dirty & R-Bit)
+    vmem->pt[page].flags = vmem->pt[page].flags | PTF_DIRTY | PTF_REF | PTF_PRESENT; //set flags (dirty & R-Bit)
 }
 
 extern void vmem_close(void)

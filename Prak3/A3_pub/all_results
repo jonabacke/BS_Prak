@@ -1,4 +1,12 @@
-seed =   2806 page_rep_algo =    FIFO search_algo =    quicksort pagesize =    8 pagefaults      69 global_count     544
-seed =   2806 page_rep_algo =    FIFO search_algo =   bubblesort pagesize =    8 pagefaults      69 global_count     544
-seed =   2806 page_rep_algo =   CLOCK search_algo =    quicksort pagesize =    8 pagefaults      69 global_count     544
-seed =   2806 page_rep_algo =   CLOCK search_algo =   bubblesort pagesize =    8 pagefaults      69 global_count     544
+seed =   2806 page_rep_algo =    FIFO search_algo =    quicksort pagesize =    8 pagefaults     462 global_count   22216
+seed =   2806 page_rep_algo =    FIFO search_algo =   bubblesort pagesize =    8 pagefaults   19147 global_count  545478
+seed =   2806 page_rep_algo =   CLOCK search_algo =    quicksort pagesize =    8 pagefaults     447 global_count   22170
+seed =   2806 page_rep_algo =   CLOCK search_algo =   bubblesort pagesize =    8 pagefaults   18082 global_count  549494
+seed =   2806 page_rep_algo =    FIFO search_algo =    quicksort pagesize =   16 pagefaults     238 global_count   21696
+seed =   2806 page_rep_algo =    FIFO search_algo =   bubblesort pagesize =   16 pagefaults   10275 global_count  540986
+seed =   2806 page_rep_algo =   CLOCK search_algo =    quicksort pagesize =   16 pagefaults     245 global_count   21872
+seed =   2806 page_rep_algo =   CLOCK search_algo =   bubblesort pagesize =   16 pagefaults    9210 global_count  555734
+seed =   2806 page_rep_algo =    FIFO search_algo =    quicksort pagesize =   32 pagefaults     125 global_count   21218
+seed =   2806 page_rep_algo =    FIFO search_algo =   bubblesort pagesize =   32 pagefaults    5813 global_count  532742
+seed =   2806 page_rep_algo =   CLOCK search_algo =    quicksort pagesize =   32 pagefaults     131 global_count   20710
+seed =   2806 page_rep_algo =   CLOCK search_algo =   bubblesort pagesize =   32 pagefaults    4779 global_count  556586

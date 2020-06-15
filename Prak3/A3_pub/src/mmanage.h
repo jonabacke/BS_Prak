@@ -16,7 +16,7 @@
 #include <string.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-
+#include "vmaccess.h"
 #include "debug.h"
 #include "pagefile.h"
 // #include "logger.h"
@@ -35,6 +35,7 @@ struct logevent
 } le;
 
 #define MMANAGE_LOGFNAME "./logfile.txt" //!< logfile name
+#define AGE_REGISTER_SIZE 8
 
 /**
  *****************************************************************************************

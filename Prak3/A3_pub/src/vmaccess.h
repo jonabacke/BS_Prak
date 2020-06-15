@@ -43,7 +43,7 @@ int vmem_read(int address);
  ****************************************************************************************/
 void vmem_write(int address, int data);
 
-
+void checkAddrSpace(int address, int addrSpace);
 
 extern void vmem_close(void);
 
