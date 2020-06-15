@@ -6,9 +6,11 @@
  *        of the reference implementation of Wolfgang Fohl.
  */
 
+#define LOGGER_H
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include "debug.h"
 /** 
  * Event struct for logging 
  */

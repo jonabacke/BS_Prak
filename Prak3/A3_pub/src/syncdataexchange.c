@@ -41,6 +41,13 @@ static bool nextOpWaitForMsg = true;         //!< For checking correct order of 
 static int refNoForAck = -1;	             //!< waitForMsg stores refCounter of msg for sendAck
 
 
+/**
+ * @brief  Diese Funktion erzeugt die Ressourcen, die zum synchronen Austausch
+ *         der Daten benötigt werden.
+ * @param  isServer Ist dieses Flag true, so wird die Kommunkation für den Server
+ *                  aufgesetzt. Ansonsten für den Client.
+ */
+static void setupSyncDataExchangeInternal(bool isServer);
 
 static void setupSyncDataExchangeInternal(bool isServer) {
    // create shared memory for data to be exchanged

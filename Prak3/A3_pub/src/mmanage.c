@@ -221,13 +221,25 @@ void cleanup(void)
 
 void vmem_init(void)
 {
+    PDEBUG("vmemInitMmanage");
     /* Create System V shared memory */
     key_t key = ftok(SHMKEY, SHMPROCID);
 
     /* We are creating the shm, so set the IPC_CREAT flag */
     int shm_id = shmget(key, SHMSIZE, IPC_CREAT | 0666);
-    TEST_AND_EXIT_ERRNO(shm_id, "shmget error");
 
+    printf("%d", shm_id);
+    TEST_AND_EXIT_ERRNO(shm_id < 0, "shmget error");
+
+    vmem = (struct vmem_struct *)malloc(sizeof(struct vmem_struct));
+    if (vmem != NULL)
+    {
+        printf("\nSpeicher ist reserviert\n");
+    }
+    else
+    {
+        printf("\nKein freier Speicher vorhanden.\n");
+    }
     for (int i = 0; i < VMEM_NPAGES; i++) //! evtl weglassen?!
     {
         vmem->pt[i].flags = 0;        //flags auf '0' setzen
@@ -235,8 +247,9 @@ void vmem_init(void)
     }
 
     /* Attach shared memory to vmem (virtual memory) */
-    int shm = shmat(shm_id, NULL, 0);
-    TEST_AND_EXIT_ERRNO(shm, "shmat error");
+    int *shm = (int *)shmat(shm_id, NULL, 0);
+
+    TEST_AND_EXIT_ERRNO(*shm < 0, "shmat error");
 
     /* Fill with zeros */
     memset(vmem, 0, SHMSIZE);
@@ -245,6 +258,7 @@ void vmem_init(void)
 int find_unused_frame()
 {
 
+    PDEBUG("freien Seitenrahmen suchen");
     /* freien Seitenrahmen suchen */
     for (int i = 0; i < VMEM_NPAGES; i = i + 8)
     {
@@ -261,9 +275,10 @@ int find_unused_frame()
 
 void allocate_page(const int req_page, const int g_count)
 {
+    PDEBUG("allocate_page");
     int frame = find_unused_frame(); //finde freien page frame...
     int *removedPage = NULL;
-    pf_count ++;
+    pf_count++;
 
     if (frame != VOID_IDX) //...unused frame found:
     {
@@ -290,7 +305,8 @@ void allocate_page(const int req_page, const int g_count)
 
         //TODO: call replacement algo from here? //update page table
     }
-
+    struct logevent le;
+    PDEBUG("logData");
     /* Log action */
     le.req_pageno = req_page;
     le.replaced_page = *removedPage;
@@ -307,6 +323,7 @@ void allocate_page(const int req_page, const int g_count)
 void findPageToRemove(int *pageToRemove)
 {
 
+    PDEBUG("findPageToRemove");
     if (pageRepAlgo == find_remove_fifo)
     {
         // pageToRemove = fifo->firstElement.page;   //first element of fifo to be removed
@@ -339,6 +356,7 @@ void findPageToRemove(int *pageToRemove)
 
 void fetchPage(int page, int frame)
 {
+    PDEBUG("fetchPage");
     /* fetch page from pagefile and write it to virtual memory*/
     fetch_page_from_pagefile(page, &frame);
 
@@ -351,6 +369,7 @@ void fetchPage(int page, int frame)
 
 void removePage(int page)
 {
+    PDEBUG("removePage");
     int address = page * VMEM_PAGESIZE;
     int offset = address % VMEM_PAGESIZE;
     int frame = vmem->pt[page].frame;
@@ -371,6 +390,7 @@ void removePage(int page)
 
 void find_remove_fifo(int page, int *removedPage, int *frame)
 {
+    PDEBUG("find_remove_fifo");
     if (removedPage != NULL) //found a page to remove
     {
         /* remove page to free page frame */
@@ -390,6 +410,7 @@ void find_remove_fifo(int page, int *removedPage, int *frame)
 
 static void find_remove_aging(int page, int *removedPage, int *frame)
 {
+    PDEBUG("find_remove_aging");
     if (removedPage != NULL) //found a page to remove
     {
         /* remove page to free page frame */
@@ -418,6 +439,7 @@ static void find_remove_aging(int page, int *removedPage, int *frame)
 
 static void update_age_reset_ref(void)
 {
+    PDEBUG("update_age_reset_ref");
     //TODO:
     for (int i = 0; i < VMEM_NPAGES; i++)
     {
@@ -425,7 +447,7 @@ static void update_age_reset_ref(void)
         {
             aging[i].swCounter = aging[i].swCounter >> 1;
         }
-        if ((aging[i].aging.flags & PTF_REF) == 1)
+        if ((aging[i].aging.flags & PTF_REF) == PTF_REF)
         {
             aging[i].swCounter = aging[i].swCounter | 0x80u;
         }
@@ -435,6 +457,7 @@ static void update_age_reset_ref(void)
 
 static void find_remove_clock(int page, int *removedPage, int *frame)
 {
+    PDEBUG("find_remove_clock");
 
     if (removedPage != NULL) //found a page to remove
     {
@@ -471,6 +494,29 @@ static void find_remove_clock(int page, int *removedPage, int *frame)
     */
 }
 
+static FILE *logfile = NULL; //!< Reference to logfile
+
+void open_logger(void)
+{
+    /* Open logfile */
+    logfile = fopen(MMANAGE_LOGFNAME, "w");
+    TEST_AND_EXIT_ERRNO(!logfile, "Error creating logfile");
+}
+
+void close_logger(void)
+{
+    fclose(logfile);
+}
+
+/* Do not change!  */
+void logger(struct logevent le)
+{
+    fprintf(logfile, "Page fault %10d, Global count %10d:\n"
+                     "Removed: %10d, Allocated: %10d, Frame: %10d\n",
+            le.pf_count, le.g_count,
+            le.replaced_page, le.req_pageno, le.alloc_frame);
+    fflush(logfile);
+}
 // EOF
 
 /*

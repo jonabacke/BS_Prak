@@ -53,13 +53,6 @@ struct msg {
 
 
 
-/**
- * @brief  Diese Funktion erzeugt die Ressourcen, die zum synchronen Austausch
- *         der Daten benötigt werden.
- * @param  isServer Ist dieses Flag true, so wird die Kommunkation für den Server 
- *                  aufgesetzt. Ansonsten für den Client.
- */
-static void setupSyncDataExchangeInternal(bool isServer); 
 
 
 

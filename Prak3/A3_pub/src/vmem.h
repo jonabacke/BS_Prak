@@ -45,7 +45,18 @@
 #define PTF_REF         4       
 
 #define VOID_IDX -1       //!< Constant for invalid page or frame reference 
-
+#define DEBUG 
+#ifdef DEBUG
+#define PDEBUG(x)                    \
+    do {                             \
+        printf(x); \
+        printf("\n"); \
+    } while (0)
+#else
+#define PDEBUG(x) \
+    do {          \
+    } while (0)
+#endif
 
 /**
  * Page table entry

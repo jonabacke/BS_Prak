@@ -14,7 +14,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-
+#define  DEBUG_MESSAGES
 #ifdef DEBUG_MESSAGES
 /**
  * Print debug message when DEBUG_MESSAGES is defined.

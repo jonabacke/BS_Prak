@@ -20,8 +20,51 @@
 
 #include "debug.h"
 #include "pagefile.h"
-#include "logger.h"
+// #include "logger.h"
 #include "syncdataexchange.h"
+
+
+/** 
+ * Event struct for logging 
+ */
+struct logevent {
+    int req_pageno;    //!< requested page number
+    int replaced_page; //!< replaced page number
+    int alloc_frame;   //!< selected frame
+    int pf_count;      //!< current number of page faults
+    int g_count;       //!< gobal quasi time stamp
+}le;
+
+#define MMANAGE_LOGFNAME "./logfile.txt"  //!< logfile name 
+
+/**
+ *****************************************************************************************
+ *  @brief      This function creates a new logfile
+ *
+ *  @return     void 
+ ****************************************************************************************/
+void open_logger(void);
+
+/**
+ *****************************************************************************************
+ *  @brief      This function closes the current logfile
+ *
+ *  @return     void 
+ ****************************************************************************************/
+void close_logger(void);
+
+/**
+ *****************************************************************************************
+ *  @brief      This function writes a log entity to the logfile.
+ *
+ *  @param      le This stucture describes the entity that should be logged.
+ *
+ *  @return     void 
+ ****************************************************************************************/
+void logger(struct logevent le);
+
+
+
 
 typedef struct aging_struct
 {
