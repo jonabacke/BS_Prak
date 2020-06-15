@@ -8,7 +8,6 @@
 #ifndef _MMANAGE_H
 #define _MMANAGE_H
 
-
 #include "vmem.h"
 #include <semaphore.h>
 #include <stdint.h>
@@ -23,19 +22,19 @@
 // #include "logger.h"
 #include "syncdataexchange.h"
 
-
 /** 
  * Event struct for logging 
  */
-struct logevent {
+struct logevent
+{
     int req_pageno;    //!< requested page number
     int replaced_page; //!< replaced page number
     int alloc_frame;   //!< selected frame
     int pf_count;      //!< current number of page faults
     int g_count;       //!< gobal quasi time stamp
-}le;
+} le;
 
-#define MMANAGE_LOGFNAME "./logfile.txt"  //!< logfile name 
+#define MMANAGE_LOGFNAME "./logfile.txt" //!< logfile name
 
 /**
  *****************************************************************************************
@@ -63,31 +62,24 @@ void close_logger(void);
  ****************************************************************************************/
 void logger(struct logevent le);
 
-
-
-
 typedef struct aging_struct
 {
     struct pt_entry aging;
     uint8_t swCounter;
 } Aging;
 
-
-struct pt_entry fifo[VMEM_NPAGES];
+int fifo[VMEM_NFRAMES];
 int fifoPointer = 0;
 
 
-struct pt_entry clock[VMEM_NPAGES];
+int clock[VMEM_NFRAMES];
 int clockPointer = 0;
 
-
-Aging aging[VMEM_NPAGES];
+Aging aging[VMEM_NFRAMES];
 
 /*
  * Signatures of private / static functions
  */
-
-
 
 /**
  *****************************************************************************************
@@ -101,8 +93,6 @@ Aging aging[VMEM_NPAGES];
  ****************************************************************************************/
 static void fetchPage(int page, int frame);
 
-
-
 /**
  *****************************************************************************************
  *  @brief      This function removes a page from main memory. If the page was modified,
@@ -114,8 +104,6 @@ static void fetchPage(int page, int frame);
  ****************************************************************************************/
 static void removePage(int page);
 
-
-
 /**
  *****************************************************************************************
  *  @brief      This function initializes the virtual memory.
@@ -125,8 +113,6 @@ static void removePage(int page);
  *  @return     void 
  ****************************************************************************************/
 static void vmem_init(void);
-
-
 
 /**
  *****************************************************************************************
@@ -141,8 +127,6 @@ static void vmem_init(void);
  *              If all frames are in use, VOID_IDX will be returned.
  ****************************************************************************************/
 static int find_unused_frame();
-
-
 
 /**
  *****************************************************************************************
@@ -160,8 +144,6 @@ static int find_unused_frame();
  ****************************************************************************************/
 static void allocate_page(const int req_page, const int g_count);
 
-
-
 /**
  *****************************************************************************************
  *  @brief      This function is the signal handler attached to system call sigaction
@@ -175,8 +157,6 @@ static void allocate_page(const int req_page, const int g_count);
  ****************************************************************************************/
 static void sighandler(int signo);
 
-
-
 /**
  *****************************************************************************************
  *  @brief      This function dumps the page table to stderr.
@@ -184,8 +164,6 @@ static void sighandler(int signo);
  *  @return     void 
  ****************************************************************************************/
 static void dump_pt(void);
-
-
 
 /**
  *****************************************************************************************
@@ -200,9 +178,7 @@ static void dump_pt(void);
  *  @param      frame Number of frame that will be used to store the page.
  *
  ****************************************************************************************/
-static void find_remove_aging(int page, int * removedPage, int *frame);
- 
-
+static void find_remove_aging(int page, int *removedPage, int *frame);
 
 /**
  *****************************************************************************************
@@ -215,8 +191,6 @@ static void find_remove_aging(int page, int * removedPage, int *frame);
  *  @return     void
  ****************************************************************************************/
 static void update_age_reset_ref(void);
-
-
 
 /**
  *****************************************************************************************
@@ -231,9 +205,7 @@ static void update_age_reset_ref(void);
  *  @param      frame Number of frame that will be used to store the page.
  *
  ****************************************************************************************/
-static void find_remove_fifo(int page, int * removedPage, int *frame);
-
-
+static void find_remove_fifo(int page, int *removedPage, int *frame);
 
 /**
  *****************************************************************************************
@@ -248,9 +220,7 @@ static void find_remove_fifo(int page, int * removedPage, int *frame);
  *  @param      frame Number of frame that will be used to store the page.
  *
  ****************************************************************************************/
-static void find_remove_clock(int page, int * removedPage, int *frame);
-
-
+static void find_remove_clock(int page, int *removedPage, int *frame);
 
 /**
  *****************************************************************************************
@@ -265,17 +235,13 @@ static void find_remove_clock(int page, int * removedPage, int *frame);
  ****************************************************************************************/
 void findPageToRemove(int *pageToRemove);
 
-
-
 /**
  *****************************************************************************************
  *  @brief      This function cleans up when mmange runs out.
  *
  *  @return     void 
  ****************************************************************************************/
-static void cleanup(void) ;
-
-
+static void cleanup(void);
 
 /**
  *****************************************************************************************
@@ -290,8 +256,6 @@ static void cleanup(void) ;
  ****************************************************************************************/
 static void scan_params(int argc, char **argv);
 
-
-
 /**
  *****************************************************************************************
  *  @brief      This function prints an error message and the usage information of 
@@ -302,8 +266,6 @@ static void scan_params(int argc, char **argv);
  *
  *  @return     void 
  ****************************************************************************************/
-static void print_usage_info_and_exit(char *err_str, char * programName);
-
-
+static void print_usage_info_and_exit(char *err_str, char *programName);
 
 #endif /* _MMANAGE_H */

@@ -1,4 +1,4 @@
-seed = 2806 sort algorithm = Quick Sort
+seed = 2806 sort algorithm = Bubble Sort
 
 Unsorted:
        855        444        741         74        219        336    8598077  752844345

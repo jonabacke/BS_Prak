@@ -45,7 +45,7 @@
 #define PTF_REF         4       
 
 #define VOID_IDX -1       //!< Constant for invalid page or frame reference 
-#define DEBUG 
+#define DEBU 
 #ifdef DEBUG
 #define PDEBUG(x)                    \
     do {                             \
