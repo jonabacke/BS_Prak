@@ -79,6 +79,11 @@ static void vmem_init(void)
 
     vmem = shmat(shm_id, NULL, 0);
     TEST_AND_EXIT_ERRNO((struct vmem_struct *)-1 == vmem, "shmat error");
+    for (int i = 0; i < VMEM_NPAGES; i++)
+    {
+        vmem->pt[i].flags = 0;
+        vmem->pt[i].frame = VOID_IDX;
+    }
 }
 
 static void vmem_put_page_into_mem(int address)
@@ -108,7 +113,9 @@ static void vmem_put_page_into_mem(int address)
         PDEBUG("msgArrived");
         ref++;
     }
+    vmem->pt[page].flags = vmem->pt[page].flags | PTF_REF | PTF_PRESENT; //set R-Bit
 
+    g_count++;
     if ((g_count % TIME_WINDOW) == 0) //Wenn Zeitintervall abgelaufen ist
     {
         PDEBUG("Zeitintervall abgelaufen");
@@ -117,7 +124,6 @@ static void vmem_put_page_into_mem(int address)
         sendMsgToMmanager(msg);
         //        waitForMsg();
     }
-    g_count++;
 }
 
 int vmem_read(int address)
@@ -147,15 +153,15 @@ int vmem_read(int address)
 
     PDEBUG("vmemRead");
 
+    vmem_put_page_into_mem(address); //put page to frame in mainMemory
     int page = address / VMEM_PAGESIZE;
     int offset = address % VMEM_PAGESIZE;
     int frame = vmem->pt[page].frame;
+    TEST_AND_EXIT(frame == VOID_IDX, (stderr, "vmacces: page isnt load.. the Mmanager fucked this up.. man"));
     PDEBUG("put page to frame in mainMemory");
-    vmem_put_page_into_mem(address); //put page to frame in mainMemory
     PDEBUG("read from memory");
-    int value = vmem->mainMemory[frame * VMEM_PAGESIZE + offset]; //read from memory
+    int value = vmem->mainMemory[(frame * VMEM_PAGESIZE) + offset]; //read from memory
     PDEBUG("set R-Bit");
-    vmem->pt[page].flags = vmem->pt[page].flags | PTF_REF | PTF_PRESENT; //set R-Bit
 
     return value;
 }
@@ -175,17 +181,18 @@ void vmem_write(int address, int data)
         vmem_init();
     }
     PDEBUG("vmemWrite");
+    vmem_put_page_into_mem(address); //put page to frame in mainMemory
     int page = address / VMEM_PAGESIZE;
     int offset = address % VMEM_PAGESIZE;
     int frame = vmem->pt[page].frame;
+    TEST_AND_EXIT(frame == VOID_IDX, (stderr, "vmacces: page isnt load.. the Mmanager fucked this up.. man"));
 
     PDEBUG("put page to frame in mainMemory");
-    vmem_put_page_into_mem(address); //put page to frame in mainMemory
 
     PDEBUG("write in memory");
-    vmem->mainMemory[frame * VMEM_PAGESIZE + offset] = data; //write in memory
+    vmem->mainMemory[(frame * VMEM_PAGESIZE) + offset] = data; //write in memory
     PDEBUG("set flags (dirty & R-Bit)");
-    vmem->pt[page].flags = vmem->pt[page].flags | PTF_DIRTY | PTF_REF | PTF_PRESENT; //set flags (dirty & R-Bit)
+    vmem->pt[page].flags = vmem->pt[page].flags | PTF_DIRTY; //set flags (dirty & R-Bit)
 }
 
 extern void vmem_close(void)

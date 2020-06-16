@@ -37,31 +37,7 @@ struct logevent
 #define MMANAGE_LOGFNAME "./logfile.txt" //!< logfile name
 #define AGE_REGISTER_SIZE 8
 
-/**
- *****************************************************************************************
- *  @brief      This function creates a new logfile
- *
- *  @return     void 
- ****************************************************************************************/
-void open_logger(void);
 
-/**
- *****************************************************************************************
- *  @brief      This function closes the current logfile
- *
- *  @return     void 
- ****************************************************************************************/
-void close_logger(void);
-
-/**
- *****************************************************************************************
- *  @brief      This function writes a log entity to the logfile.
- *
- *  @param      le This stucture describes the entity that should be logged.
- *
- *  @return     void 
- ****************************************************************************************/
-void logger(struct logevent le);
 
 typedef struct aging_struct
 {
@@ -69,8 +45,7 @@ typedef struct aging_struct
     uint8_t swCounter;
 } Aging;
 
-int fifo[VMEM_NFRAMES];
-int fifoPointer = 0;
+
 
 
 int clock[VMEM_NFRAMES];
@@ -268,5 +243,32 @@ static void scan_params(int argc, char **argv);
  *  @return     void 
  ****************************************************************************************/
 static void print_usage_info_and_exit(char *err_str, char *programName);
+
+
+/**
+ *****************************************************************************************
+ *  @brief      This function creates a new logfile
+ *
+ *  @return     void 
+ ****************************************************************************************/
+void open_logger(void);
+
+/**
+ *****************************************************************************************
+ *  @brief      This function closes the current logfile
+ *
+ *  @return     void 
+ ****************************************************************************************/
+void close_logger(void);
+
+/**
+ *****************************************************************************************
+ *  @brief      This function writes a log entity to the logfile.
+ *
+ *  @param      le This stucture describes the entity that should be logged.
+ *
+ *  @return     void 
+ ****************************************************************************************/
+void logger(struct logevent le);
 
 #endif /* _MMANAGE_H */

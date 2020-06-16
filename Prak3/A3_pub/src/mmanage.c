@@ -119,7 +119,7 @@ void scan_params(int argc, char **argv)
             // page replacement strategies fifo selected
             pageRepAlgo = find_remove_fifo;
 
-            fifoPointer = 0;
+            // fifoPointer = 0;
 
             param_ok = true;
         }
@@ -128,7 +128,7 @@ void scan_params(int argc, char **argv)
             // page replacement strategies clock selected
             pageRepAlgo = find_remove_clock;
 
-            clockPointer = 0;
+            // clockPointer = 0;
 
             param_ok = true;
         }
@@ -310,7 +310,7 @@ void allocate_page(const int req_page, const int g_count)
     //!ack?
     //    sendAck();
 }
-
+/*
 // //!TODO: implementieren..
 // void findPageToRemove(int *pageToRemove)
 // {
@@ -345,7 +345,7 @@ void allocate_page(const int req_page, const int g_count)
 //         }
 //     }
 // }
-
+*/
 void fetchPage(int page, int frame)
 {
     PRINT_DEBUG((stderr, "fetchPage called. Page: %d, Frame: %d\n", page, frame));
@@ -388,7 +388,7 @@ void removePage(int page)
     //TODO: überlegen, ob das als 'löschen' so ausreicht.. denke das reicht
 }
 
-static void init_fifo(int *fifo)
+static void init_fifo(int* fifo)
 {
     static bool init = true;
     if (init)
@@ -410,6 +410,8 @@ static void init_fifo(int *fifo)
 void find_remove_fifo(int page, int *removedPage, int *frame)
 {
     PDEBUG("find_remove_fifo");
+    static int fifo[VMEM_NFRAMES];
+    static int fifoPointer = 0;
     init_fifo(fifo);
 
     checkAddrSpace(page, VMEM_NPAGES);
@@ -519,7 +521,7 @@ static void update_age_reset_ref(void)
             if (((vmem->pt[i].flags & PTF_REF) == PTF_REF))
             {
                 vmem->pt[i].flags = vmem->pt[i].flags & (~PTF_REF); // Reset des Ref bits
-                mask = (1 >> (AGE_REGISTER_SIZE - 1));
+                mask = (1 << (AGE_REGISTER_SIZE - 1));
             }
             int currFrame = vmem->pt[i].frame;
             age[currFrame].age = (age[currFrame].age >> 1) | mask;
@@ -537,6 +539,7 @@ static void initClk(int *clock)
         // Alle eingelagerten Seiten in die Queue aufnehmen.
         for (int i = 0; i < VMEM_NPAGES; i++)
         {
+            //checken der flags
             int currFlag = vmem->pt[i].flags;
             if (currFlag != 0)
             { // Wenn die Seite entweder Dirty oder Present ist
